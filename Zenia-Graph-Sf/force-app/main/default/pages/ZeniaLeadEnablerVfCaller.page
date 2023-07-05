@@ -1,0 +1,25 @@
+<apex:page showHeader="false" sidebar="false" standardController="Lead" recordSetVar="lds" extensions="zeniaExtendListViews">
+    <apex:includeScript value="/soap/ajax/18.0/connection.js"/>
+    <apex:includeLightning />   
+    
+    <div id="lightningId" /> 
+    
+    <script type="text/javascript">
+    //get contact Id from URL
+    var GetIDs= '{!leadIds}';
+    
+    //Create Lightning Component
+    $Lightning.use("zeniadev:LeadEnablerApp", function() {
+        $Lightning.createComponent("zeniadev:leadEnablerCmp", 
+                                   { "leadIds" : GetIDs }, //Pass Parameter
+                                   "lightningId", 
+                                   function(component) {
+                                       console.log('Component created Successfully');
+                                   });
+    });
+    
+    </script>
+    
+    
+    
+</apex:page>

@@ -1,0 +1,38 @@
+.zenia-align{
+	color :black;
+	padding-top: 0.5rem;
+	font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+}
+.c-container {
+    border: 1px solid #d8dde6;
+    margin: 10px 0 20px;
+}
+
+ .custom-box {
+    background-color: #f4f6f9;
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+}
+
+.position{
+	padding:5% 
+}
+.font-color{
+    color: black;
+    font-size: 16px;
+}
+.headingclr{
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.bg-clr{
+    background-color: lightgrey;
+}
+
+:host {
+    --slds-c-textarea-sizing-min-height: 500px;
+}

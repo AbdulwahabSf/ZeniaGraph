@@ -1,0 +1,5 @@
+<aura:component implements="force:lightningQuickAction" access="global" >
+
+    <!--<aura:handler name="init" value="{!this}" action="{!c.init} "/>-->
+    <c:leadEnablerCmp/>
+</aura:component>

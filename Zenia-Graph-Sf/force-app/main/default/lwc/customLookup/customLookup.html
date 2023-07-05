@@ -1,0 +1,50 @@
+<template>
+    <div class="slds-form-element">
+        <template if:true={_showLabel}>
+            <label class="slds-form-element__label" for="combobox-id-1" id="combobox-label-id-43">{label}</label>
+        </template>
+
+        <div class="slds-form-element__control">
+            <div class="slds-combobox_container">
+                <div class={boxClass}>
+                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                        <template if:true={selectedItemId}>
+                         
+                            <input type="text" value={selectedItemName} readonly
+                                    class="slds-input slds-combobox__input slds-combobox__input-value slds-border_top slds-border_right slds-border_bottom slds-border_left"/>
+                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Clear Selection">
+                                <lightning-icon icon-name="utility:close" size="xx-small" alternative-text="close icon" 
+                                                class="slds-p-left_x-small" onclick={handleRemove}>
+                                </lightning-icon> 
+                            </button>
+                            
+                        </template>
+
+                        <template if:false={selectedItemId}>
+                            <lightning-input class={inputClass} type="search" value={searchTerm} name="searchInput"
+                                             onclick={handleClick} onblur={handleBlur} onchange={handleChange}
+                                             variant="label-hidden" autocomplete="off" placeholder={searchPlaceholder}
+                                             is-loading={isLoading}>
+                            </lightning-input>
+                        </template>
+                    </div>
+                    <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                            <template for:each={records} for:item="record">
+                                <li key={record} data-id={record} data-name={record} onclick={handleItemClick} role="presentation" class="slds-listbox__item">
+                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                       
+                                            <div class="slds-listbox__option-text slds-listbox__option-text_entity">
+                                                {record}
+                                            </div>
+                                        
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

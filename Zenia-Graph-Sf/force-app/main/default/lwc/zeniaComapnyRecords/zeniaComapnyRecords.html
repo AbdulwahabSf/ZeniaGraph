@@ -1,0 +1,108 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>
+</template>
+    <template if:false={listView}>
+<template if:true={showError}>
+    <div class=" slds-text-color_error slds-text-color_error slds-text-heading_medium slds-align_absolute-center">Please Select A Record</div>
+    <br>
+    <div class="slds-align_absolute-center">
+      <lightning-button variant="brand" label="Go Back" onclick={goToListView}></lightning-button>
+    </div>
+</template>
+
+<template if:true={showError1}>
+    <div class=" slds-text-color_error slds-text-color_error slds-text-heading_medium slds-align_absolute-center">Please Select Only One Record</div>
+    <br>
+    <h1>
+    <span class="slds-page-header__title slds-truncate" title="Currently Selected Companies">Currently Selected Companies</span>
+      </h1>
+      <br>
+    <lightning-datatable
+    key-field="id"
+    data={selectedRecordData}
+    columns={columns}
+    onrowselection={handleSelectCompany}>
+    </lightning-datatable>
+    <footer class="slds-modal__footer">
+ <div class="slds-grid slds-gutters slds-align_absolute-center">
+    <lightning-layout>
+        <lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
+            <lightning-button label="Go Back" variant="brand-outline" onclick={goToListView}></lightning-button>
+        </lightning-layout-item>
+        <lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
+            <lightning-button label="Show Similar Company" variant="brand" onclick={goToSearch} disabled={showButton} ></lightning-button>
+        </lightning-layout-item>
+    </lightning-layout>
+    </div>
+</footer>
+
+</template>
+</template>
+
+<template if:true={listView}>
+    <template if:true={loding}>
+        <lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>
+</template>
+<template if:true={showError1}>
+    <div class=" slds-text-color_error slds-text-color_error slds-text-heading_medium slds-align_absolute-center">Please Select Only One Record</div>
+    <br>
+    <h1>
+    <span class="slds-page-header__title slds-truncate" title="Currently Selected Companies">Currently Selected Companies</span>
+      </h1>
+      <br>
+    <lightning-datatable
+    key-field="id"
+    data={selectedRecordData}
+    columns={columns}
+    onrowselection={handleSelectCompany}>
+    </lightning-datatable>
+    <footer class="slds-modal__footer">
+        <div class="slds-grid slds-gutters slds-align_absolute-center">
+           <lightning-layout>
+               <lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
+                   <lightning-button label="Go Back" variant="brand-outline" onclick={goToListView}></lightning-button>
+               </lightning-layout-item>
+               <lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
+                   <lightning-button label="Show Similar Company List" variant="brand" onclick={goToSearch} disabled={showButton} ></lightning-button>
+               </lightning-layout-item>
+           </lightning-layout>
+           </div>
+       </footer>
+</template>
+    <template if:true={showData}>
+        <div>
+            <lightning-datatable
+                    key-field="id"
+                    data={data}
+                    columns={listViewColumns}
+                    show-row-number-column
+                    row-number-offset={rowOffset}
+                    hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+        <footer class="slds-modal__footer">
+            <div class="slds-grid slds-gutters slds-align_absolute-center">
+            <lightning-layout>
+                <lightning-layout-item  class="slds-m-top_small slds-m-left_x-small">
+                    <lightning-button label="Go Back" variant="brand-outline" onclick={goToListView}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item  class="slds-m-top_small slds-m-left_x-small">
+                    <lightning-button label="Show KG" variant="brand" onclick={showKnowledgeGraph}></lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+        </footer>
+    </template>
+
+    <template if:true={showError}>
+        <div class=" slds-text-color_error slds-text-color_error slds-text-heading_medium slds-align_absolute-center">Please Select A Record</div>
+    <br>
+    <div class="slds-align_absolute-center">
+      <lightning-button variant="brand" label="Go Back" onclick={goToListView}></lightning-button>
+    </div>
+    </template>
+</template>
+    
+</template>
