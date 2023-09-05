@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Datasource__c</fullName>
+    <externalId>false</externalId>
+    <label>Datasource</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Crunch Base</fullName>
+                <default>false</default>
+                <label>Crunch Base</label>
+            </value>
+            <value>
+                <fullName>linkedin</fullName>
+                <default>false</default>
+                <label>LinkedIn</label>
+            </value>
+            <value>
+                <fullName>salesforce</fullName>
+                <default>true</default>
+                <label>Salesforce</label>
+            </value>
+            <value>
+                <fullName>dbpedia</fullName>
+                <default>false</default>
+                <label>DBPedia</label>
+            </value>
+            <value>
+                <fullName>zoominfo</fullName>
+                <default>false</default>
+                <label>ZoomInfo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

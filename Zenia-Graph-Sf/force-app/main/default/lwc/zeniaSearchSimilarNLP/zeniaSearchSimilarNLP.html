@@ -1,0 +1,96 @@
+<template>
+	<template if:true={displayContent}>
+
+		<section role="log" class="slds-chat">
+			<div class="slds-scrollable_y scroll-section" style="height:10rem;" tabindex="0">
+				<ul class="slds-chat-list">
+					<template for:each={queryData} for:item="qd">
+
+						<li if:false={qd.isAssistant} key={qd.content}
+							class="slds-chat-listitem slds-chat-listitem_outbound">
+							<div if:true={qd.contentshow}>
+								<div class="slds-chat-message">
+									<div class="slds-chat-message__body">
+										<div class="slds-chat-message__text slds-chat-message__text_outbound">
+
+											<span>{qd.content}</span>
+
+										</div>
+									</div>
+									<span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                        			</span>
+								</div>
+							</div>
+						</li>
+						<li if:true={qd.isAssistant} key={qd.content}
+							class="slds-chat-listitem slds-chat-listitem_inbound">
+							<div class="slds-chat-message">
+								<span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                            		<abbr class="slds-avatar__initials slds-avatar__initials_inverse" title="AskMe Buddy">NLP</abbr>
+                        		</span>
+								<div class="slds-chat-message__body">
+									<div class="slds-chat-message__text slds-chat-message__text_inbound">
+										<template if:true={qd.showKgUrl}>
+											<p> 
+												<a href={qd.showKgUrl} target="_blank">
+													ShowKG
+												</a> 
+											</p>
+										</template>
+										<template if:false={qd.showKgUrl}>
+											<p class='slds-m-top_x-small'> 
+												No ShowKG Results found
+											</p>
+										</template>
+
+										<template if:true={qd.redisUrl}>
+											<p class='slds-m-top_x-small'>
+												<a href={qd.redisUrl} target="_blank">
+													Text Similarity
+												</a> 
+											</p>
+										</template>
+										<template if:false={qd.redisUrl}>
+											<p class='slds-m-top_x-small'> 
+												No Text Similiarity Results found
+											</p>
+										</template>
+
+										<template if:true={qd.graphDbUrl}>
+											<p class='slds-m-top_x-small'> 
+												<a href={qd.graphDbUrl} target="_blank">
+												Graph Similarity
+												</a> 
+											</p>
+										</template>
+										<template if:false={qd.graphDbUrl}>
+											<p class='slds-m-top_x-small'> 
+												No Graph Similarity Results found
+											</p>
+										</template>
+									</div>
+								</div>
+							</div>
+						</li>
+					</template>
+				</ul>
+			</div>
+		</section>
+
+	</template>
+
+	<div class="slds-grid slds-gutters" style="padding-left:12px;">
+		<div class="slds-col slds-col slds-size_10-of-12">
+			<span><lightning-textarea type="text" variant="standard" data-id="userinputText" label="Enter Query"
+					placeholder="Enter your query here..." disabled={isLoading} value={initialvalue} >
+				  </lightning-textarea></span>
+		</div>
+		<div class="slds-col slds-size_1-of-12" style="padding-top:20px;">
+			<span><lightning-button variant="brand" label="Search" title="Search" onclick={submitSearchHandler}>
+				  </lightning-button></span>
+		</div>
+		<div if:true={isLoading} class="slds-is-relative slds-spinner_brand loadingSpinner">
+			<lightning-spinner alternative-text="Loading"></lightning-spinner>
+		</div>
+	</div>
+</template>

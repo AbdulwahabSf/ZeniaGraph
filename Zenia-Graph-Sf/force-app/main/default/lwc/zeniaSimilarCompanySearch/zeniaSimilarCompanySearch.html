@@ -1,0 +1,118 @@
+<template>
+
+	<div class="mainOuterDiv">
+
+		<lightning-tabset>
+			<lightning-tab label="LLM Prompt">
+
+				 <!-- <template if:true={displayContent}>
+
+					<section role="log" class="slds-chat">
+						<div class="slds-scrollable_y scroll-section" style="height:6rem;" tabindex="0" >
+							<ul class="slds-chat-list">
+								<template for:each={queryData} for:item="qd">
+
+									<li if:true={qd.isAssistant} key={qd.content}
+										class="slds-chat-listitem slds-chat-listitem_inbound">
+										<div class="slds-chat-message">
+											<span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                            <abbr class="slds-avatar__initials slds-avatar__initials_inverse" title="AskMe Buddy">SQ</abbr>
+                        </span>
+											<div class="slds-chat-message__body">
+												<div class="slds-chat-message__text slds-chat-message__text_inbound">
+											<template if:true={qd.disShowKg}>
+										     	<p> 
+													 {qd.companyNames} <br>
+												<a href={qd.showKgUrl} target="_blank">
+													ShowKG
+												</a> 
+												</p>
+										</template>
+										<template if:false={qd.disShowKg}>
+											<p class='slds-m-top_x-small'> 
+												No ShowKG Results found
+											</p>
+										</template>
+
+												</div>
+											</div>
+										</div>
+									</li>
+									<li if:false={qd.isAssistant} key={qd.content}
+										class="slds-chat-listitem slds-chat-listitem_outbound">
+										<div class="slds-chat-message">
+											<div class="slds-chat-message__body">
+												<div class="slds-chat-message__text slds-chat-message__text_outbound">
+													<span>{qd.content}</span>
+												</div>
+											</div>
+											<span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                 					       </span>
+										</div>
+									</li>
+								</template>
+							</ul>
+						</div>
+					</section>
+				</template>  -->
+
+				<div class="slds-grid slds-gutters" style="padding-left:12px;">
+					<div class="slds-col slds-col slds-size_10-of-12">
+						<span><lightning-textarea type="text" variant="standard" data-id="userinputText" label="Enter Query"
+					placeholder="Enter your query here..." disabled={isLoading} value={initialvalue} >
+				  </lightning-textarea></span>
+					</div>
+					<div class="slds-col slds-size_1-of-12" style="padding-top:20px;">
+						<span><lightning-button variant="brand" label="Search" title="Search" onclick={submitSearchHandler}>
+				  </lightning-button></span>
+					</div>
+					<div if:true={isLoading} class="slds-is-relative slds-spinner_brand loadingSpinner">
+						<lightning-spinner alternative-text="Loading"></lightning-spinner>
+					</div>
+				</div>
+				 <template if:true={displayContent}>
+				  	<div class="slds-grid slds-gutters">
+       <div class="slds-col slds-size_2-of-3">
+       <span></span>
+      </div>
+     <div class="slds-col slds-size_1-of-3">
+    <span><lightning-button label="ShowKG"  variant="brand-outline" onclick={openShowKg}>
+		</lightning-button></span>
+    </div>
+    </div>
+				<div class="slds-scrollable_y scroll-section " style="height:10rem;width:600px;padding-left:12px;" tabindex="0">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<th class="" scope="col">
+						<div class="slds-truncate" title="Company">Company</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Company">Source</div>
+						</th>
+					</tr>
+				</thead>
+					<tbody>			 
+					 <template for:each={showKgCompanies} for:item="ld" for:index="index">
+						<tr key={ld.id}>
+							<td scope="col">
+							 <div>{ld.companyName}</div>
+							</td>
+							<td scope="col">
+							  <div>{ld.source}</div> 
+							</td>
+						</tr>
+					</template>
+					</tbody>
+		      </table>
+				</div>
+           </template>	
+			</lightning-tab>
+
+			<lightning-tab label="NLP Prompt"> 
+				<c-zenia-n-l-p-prompt ></c-zenia-n-l-p-prompt>
+			</lightning-tab>
+		</lightning-tabset>
+	</div>
+
+</template>

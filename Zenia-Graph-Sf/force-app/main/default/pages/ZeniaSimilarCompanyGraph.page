@@ -1,0 +1,34 @@
+<apex:page showHeader="false" sidebar="false" standardController="Lead" recordSetVar="lds" extensions="zeniaExtendListViews" >
+    <apex:includeLightning /> 
+    <apex:slds />
+  <div  id="LoadingvfDIV" class="slds-spinner_container" >
+            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                   <div class="slds-spinner__dot-b"></div>
+             </div>
+        </div> 
+    
+     <div id="LightningComponentid" />    
+    
+    
+    <script type="text/javascript">
+    //get contact Id from URL
+    var GetIDs= '{!leadIds}';
+    var listView = true;
+    var env = 'graph';
+
+    $Lightning.use("zeniadev:SimilarCompaniesApp", function() {
+        $Lightning.createComponent("zeniadev:zeniaComapnyRecords",
+                                     {"leadIds" : GetIDs ,"listView":listView,"Env" : env},
+                                     "LightningComponentid",
+          function(cmp) {
+              var loadingDivElt = document.getElementById("LoadingvfDIV");
+                                   loadingDivElt.style.display = 'none' ;
+              //                   console.log('hiding spinnner');
+              //  console.log('LWC Componenet added in VF page');
+          });
+    });
+    </script>
+ 
+</apex:page>

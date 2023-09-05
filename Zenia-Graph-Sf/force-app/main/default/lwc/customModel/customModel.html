@@ -1,0 +1,36 @@
+<template>
+
+	<lightning-modal-header label="Contact Details" size="x_small">
+	</lightning-modal-header>
+	<lightning-modal-body>
+		<template if:true={showContacts}>
+			
+			<template for:each={contactDetails} for:item="con" for:index="index">
+				<div key={con.index}>
+					<ul class="slds-has-dividers_around-space">
+				<li class="slds-item">		
+					<!-- Contact {con.sno} -->
+					Name  : {con.FirstName} {con.LastName}
+					<!-- <br/>
+					Last Name   : {con.LastName} -->
+					<div class="slds-m-bottom_medium">
+					Designation : {con.zeniadev__Designation__c}
+					</div>
+				</li>
+					</ul>
+				</div>
+			</template>
+		</template>
+		<template if:false={showContacts}>
+			<div class="slds-align_absolute-center">
+				No contact data found.
+			</div>
+		</template>
+	</lightning-modal-body>
+	<lightning-modal-footer>
+		<div class="slds-m-top_small slds-align_absolute-center">
+
+		</div>
+	</lightning-modal-footer>
+
+</template>

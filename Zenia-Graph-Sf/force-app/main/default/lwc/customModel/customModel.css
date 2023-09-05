@@ -1,0 +1,10 @@
+.dummy{
+	color : black;
+}
+.model-alignment{
+	position: center;
+	width: 500px;
+}
+.slds-modal__container{
+	width: 500px;
+}
