@@ -5,12 +5,16 @@ public class zeniaShowKgResponseHandler {
         List<String> leadcompany = new List<String>(); 
         List<Map<String, String>> leadMapList = new List<Map<String, String>>();
         List<Lead> leads = [Select Id, Company, Datasource__c from Lead where Id IN :leadIds];
-        
+         string sfvalue = 'salesforce';
         for(Lead ld : leads){
             leadcompany.add(ld.Company);
             Map<String, String> leadMap = new Map<String, String>();
             leadMap.put('name', ld.Company);
-			leadMap.put('source',ld.Datasource__c); 
+             if(String.isBlank(ld.Datasource__c)){
+			//leadMap.put('source',sfvalue);
+             }else {
+               //  leadMap.put('source',ld.Datasource__c);
+             }
             leadMapList.add(leadMap);    
         
         }
@@ -30,8 +34,8 @@ public class zeniaShowKgResponseHandler {
     public static string getshowkgresponse(list<String> company_lis, List<Map<String,String>> leadMapList){
         System.debug('source company '+leadMapList);
         System.debug('CompanyName '+company_lis);
-           String jsonBody = '{"query":"query showGraphDbKg($company_list: [CompanyListSource!])\\r\\n{\\r\\n    showGraphDbKg(company_list: $company_list)\\r\\n    {\\r\\n        graph_url\\r\\n    } \\r\\n}\\r\\n","variables":{"company_list":'+json.serialize(leadMapList)+'}}';
-        
+           String jsonBody = '{"query":"query showGraphDbKg($company_list: [ShowkgRequest!])\\r\\n{\\r\\n    showGraphDbKg(company_list: $company_list)\\r\\n    {\\r\\n        graph_url\\r\\n    } \\r\\n}","variables":{"company_list":'+json.serialize(leadMapList)+'}}';
+        system.debug('jsonBody'+jsonBody);
          Zenia_API_Service__c zeniacs = getCustomSettingInstance();  
                 Http h = new Http();
 

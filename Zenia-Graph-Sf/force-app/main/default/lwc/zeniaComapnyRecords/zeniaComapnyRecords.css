@@ -1,0 +1,12 @@
+.dummy{
+	color : blue;
+}
+
+.bg-color-green {
+	background: lightgreen;
+}
+.tableScroll {
+    overflow: auto;
+    overflow-y: hidden;
+    height: 20rem;
+}

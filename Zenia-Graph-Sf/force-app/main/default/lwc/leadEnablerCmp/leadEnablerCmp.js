@@ -7,216 +7,315 @@ import saveLeads from '@salesforce/apex/generateApiPayloadResponse.saveLeads';
 export default class LeadEnablerCmp extends NavigationMixin(LightningElement) {
 
     @api leadIds;
-    @api selectedLead;
-    @track isModalOpen = true;
-    @track showData = false;
+    @track isModalOpen = 'slds-show';
+    @track showData = 'slds-hide';
     @track data = [];
-    @track error;
-    @track selectedLeads;
-    @track SelecteddataSource = [];
-    @track templateText;
-    @track companies = [];
     @track CompanyInfo;
     @track leads = [];
-    @track sourceValue = [];
-    @track initialvalue = 'ACTIVE:\n+40 years operating business\n+50 employees+10 mil in investment funding\n+2% growth quarterly\n+3% growth yearly\nINACTIVE:\n-160 year operating business\n-60000 employees\n-5 mil in investment funding\n-5% growth quarterly\n-1% growth yearly\nOTHERS:\nAny other leads which are not Active or Inactive';
+    @track initialvalue = '';
     @track displaySIC = false;
     @track displayNIAC = false;
-    @track radiochecked = false;
-    @track sicradiochecked = false;
-    @track codes =[];
     @track NaicKey;
     @track SicKey;
     @track showSpinner = true;
-    
+    @track classifyValue = 'None';
+    @track defaultTextVal;
+    plusOpp = '+40';
+    posEmpNumber = '+50';
+    growthQuar = '+2%';
+    growthYrly = '+3%';
+    negOpp = '-160';
+    negEmpNumber = '-60000';
+    negGrowthQuar = '-5%';
+    negGrowthYrly = '-1%';
+    OperatingBusiness = 'years operating business';
+    employees = 'employees';
+    growthQuarterly = 'growth quarterly';
+    growthYearly = 'growth yearly';
+    OthersText = 'Any other leads which are not Active or Inactive';
+    @track isAdvanceArea = 'slds-hide';
+    @track isBasicArea = 'slds-show';
+    isLinkedIn = true;
+    isDBPedia = true;
+    isZoomInfo = true;
+    @track checked = false;
+    @track defaultChecked;
+    @track searchable = [];
+    staticQuery = 'ACTIVE:\\n' + this.plusOpp + ' years operating business\\n' + this.posEmpNumber + ' employees\\n' + this.growthQuar + ' growth quarterly\\n' + this.growthYrly + ' growth yearly\\nINACTIVE:\\n' + this.negOpp + ' years operating business\\n' + this.negEmpNumber + ' employees\\n' + this.negGrowthQuar + ' growth quarterly\\n' + this.negGrowthYrly + ' growth yearly\\nOthers:\\nAny other leads which are not Active or Inactive';
 
-    get radioOptions() {
+ 
+    @track pageNo = 1;
+    @track pageSize = 10;    
+
+    get lastPage() {
+        return  Math.ceil(this.leads.length / this.pageSize);
+    }
+
+    get disablePrev() {
+        return this.pageNo == 1;
+    }
+
+    get disableNext() {
+        return this.pageNo == Math.ceil(this.leads.length / this.pageSize);
+    }
+
+    remove_tags(html) {
+        var html = html.replaceAll("<p>", "||p||").replaceAll("</p>", "||||p||||");
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        html = tmp.textContent || tmp.innerText;
+        html = html.replaceAll("||p||", "").replaceAll("||||p||||", "\\n");
+        return html.replaceAll("||||", "\\n")
+    }
+
+
+    get classifyoptions() {
         return [
-            { label: 'One Time', value: 'option1' },
-            { label: 'Ongoing', value: 'option2' },
+            { label: 'NAICS Code', value: 'NAICS' },
+            { label: 'SIC Code', value: 'SIC' },
+            { label: 'None', value: 'None' },
         ];
     }
 
-    get radioOptionsInd() {
-        return [
-            { label: 'NAICS CODE Filter', value: 'option1' },
-            { label: 'Ongoing', value: 'option2' },
-            { label: 'None', value: 'option3' }
-        ];
+    handleRadioChange(event) {
+        const selectedOption = event.detail.value;
+        this.classifyValue = selectedOption;
+        if (selectedOption == 'SIC') {
+            this.displaySIC = true;
+            this.displayNIAC = false;
+
+        } else if (selectedOption == 'NAICS') {
+            this.displayNIAC = true;
+            this.displaySIC = false;
+
+        } else if (selectedOption == 'None') {
+            this.displayNIAC = false;
+            this.displaySIC = false;
+
+        }
     }
 
     openModal() {
         // to open modal set isModalOpen tarck value as true
-        this.isModalOpen = true;
+        this.isModalOpen = 'slds-show';
     }
 
     closeModal() {
         // to close modal set isModalOpen tarck value as false
 
-        this.isModalOpen = false;
-        this.showData = false;
+        this.isModalOpen = 'slds-hide';
+        this.showData = 'slds-hide';
         window.open('/lightning/o/Lead/list?filterName=Recent', '_self');
 
     }
 
-    connectedCallback(){
-              this.displayNIAC = false;
-              this.displaySIC = false;
-    }
-
-
-    get getoptions() {
-        return [
-            { label: 'linkedin', value: 'option1' },
-            { label: 'zoominfo', value: 'option3' },
-        ];
-    }
     get selectedValues() {
         return this.value.join(',');
     }
 
-     handleCode(){
-         let code = event.target.dataset.id;
-         if(code == 'SIC'){
-             this.displaySIC = true;
-             this.displayNIAC = false;
-
-         }else if(code == 'NAICS'){
-             this.displayNIAC = true;
-             this.displaySIC = false;
-
-         }else if(code == 'None'){
-              this.displayNIAC = false;
-              this.displaySIC = false;
-
-              }
-    }
-
-
-    handleLookupItemSelected(event){   
-        var source = event.target.dataset.id;   
+    handleLookupItemSelected(event) {
+        var source = event.target.dataset.id;
         const searchKey = event.detail;
-       // console.log('searchkey '+searchKey);
-        if(source == 'NIAC'){
+
+        if (source == 'NIAC') {
             this.NaicKey = searchKey;
-           
-        } else if (source == 'SIC'){
-             this.SicKey = searchKey;
-             
-    
+
+        } else if (source == 'SIC') {
+            this.SicKey = searchKey;
         }
-
     }
-
 
     handleChange(event) {
-        let checked = event.target.checked;
         let source = event.target.dataset.id;
-        console.log('checked '+checked);
-        console.log('checked '+source);
-        if(checked && !this.SelecteddataSource.includes(source))
-            this.SelecteddataSource.push(source);
-        else if(!checked && this.SelecteddataSource.includes(source)) {
-           // console.log('index = ' + this.SelecteddataSource.indexOf(source));
-            this.SelecteddataSource.splice(this.SelecteddataSource.indexOf(source), 1);
+        let checked = event.target.checked;
+
+        if (source == 'linkedin') {
+            this.isLinkedIn = checked;
+        } else if (source == 'dbpedia') {
+            this.isDBPedia = checked;
+        } else if (source == 'zoominfo'){
+            this.isZoomInfo = checked;
         }
     }
 
 
     // Select the all rows
-    allSelected(event) {    
+    allSelected(event) {
         this.leads.forEach((item, index) => {
-            item.isSelected = (event.target.checked ? true : false);
+            item.defaultChecked = (event.target.checked ? true : false);
         });
     }
 
 
-    handlePrevious() {
-        this.isModalOpen = true;
-        this.showData = false;
-        //this.template.querySelector('lightning-input').reset();
-       
+    handleToggle(event) {
+        this.checked = !this.checked;
+        if (this.checked == true) {
+
+            this.isAdvanceArea = 'slds-show';
+            this.isBasicArea = 'slds-hide';
+            this.initialvalue = '<p><strong style="font-size: 16px;">ACTIVE</strong></p><p><span style="font-size: 16px;"> '+ this.plusOpp +' years operating business</span></p><p><span style="font-size: 16px;">'+ this.posEmpNumber +' employees</span></p><p><span style="font-size: 16px;">'+ this.growthQuar +' growth quarterly</span></p><p><span style="font-size: 16px;">'+ this.growthYrly +' growth yearly</span></p><p><strong style="font-family: sans-serif; font-size: 16px;">INACTIVE</strong></p><p><span style="font-family: sans-serif; font-size: 16px;">'+ this.negOpp +' years operating business</span></p><p><span style="font-family: sans-serif; font-size: 16px;"> '+ this.negEmpNumber +' employees</span></p><p><span style="font-family: sans-serif; font-size: 16px;">'+ this.negGrowthQuar +' growth quarterly</span></p><p><span style="font-family: sans-serif; font-size: 16px;">'+ this.negGrowthYrly +' growth yearly</span></p><p><strong style="font-family: sans-serif; font-size: 16px;">OTHERS</strong></p><p><span style="font-family: sans-serif; font-size: 16px;">Any other leads which are not Active or Inactive</span></p>';
+
+        } else if (this.checked == false) {
+
+            this.isAdvanceArea = 'slds-hide';
+            this.isBasicArea = 'slds-show ';
+        }
     }
 
- 
 
-     handleDefaultText(){
-         this.initialvalue = '';
-         var defaulttext = event.target.value;
-         this.initialvalue = event.target.value;
 
-     }
-      
-    submitDetails() {    
+    handleDefaultText() {
+
+        this.initialvalue = event.target.value;
+        this.defaultTextVal = this.remove_tags(this.initialvalue);
+
+    }
+
+
+    HandleCriteriaChange(event) {
+
+        let criteriaval = event.target.dataset.id;
+
+        if (criteriaval == "plusOpp") {
+            this.plusOpp = event.target.value;
+        } else if (criteriaval == "posEmpNumber") {
+            this.posEmpNumber = event.target.value;
+        } else if (criteriaval == "growthQuar") {
+            this.growthQuar = event.target.value;
+        } else if (criteriaval == "growthYrly") {
+            this.growthYrly = event.target.value;
+        } else if (criteriaval == "negOpp") {
+            this.negOpp = event.target.value;
+        } else if (criteriaval == "negEmpNumber") {
+            this.negEmpNumber = event.target.value;
+        } else if (criteriaval == "negGrowthQuar") {
+            this.negGrowthQuar = event.target.value;
+        } else if (criteriaval == "negGrowthYrly") {
+            this.negGrowthYrly = event.target.value;
+        }
+
+        this.staticQuery = 'ACTIVE:\\n' + this.plusOpp + ' years operating business\\n' + this.posEmpNumber + ' employees\\n' + this.growthQuar + ' growth quarterly\\n' + this.growthYrly + ' growth yearly\\nINACTIVE:\\n' + this.negOpp + ' years operating business\\n' + this.negEmpNumber + ' employees\\n' + this.negGrowthQuar + ' growth quarterly\\n' + this.negGrowthYrly + ' growth yearly\\nOthers:\\nAny other leads which are not Active or Inactive';
+        // console.log('static query ', this.staticQuery);
+        this.initialvalue = '';
+
+
+    }
+
+    
+    
+
+    handlePrevious() {
+        this.isModalOpen = 'slds-show';
+        this.showData = 'slds-hide';
+        this.initialvalue = this.initialvalue;
+    }
+
+
+
+    submitDetails() {
+       let results = [];
+
+        if (this.initialvalue) {
+            this.defaultTextVal = this.remove_tags(this.initialvalue);
+        } else {
+            this.defaultTextVal = this.staticQuery;
+        }
+
+        // console.log('default query', this.defaultTextVal);
+
         let options = [];
-       
-        graphResponse({ leadIds: this.leadIds.split(','), queryData: this.initialvalue, dataSources: this.SelecteddataSource , naicValue : this.NaicKey , sicValue : this.SicKey})
+
+        let selectedDataSources = [];
+        if (this.isLinkedIn)
+            selectedDataSources.push('linkedin');
+        if (this.isDBPedia)
+            selectedDataSources.push('dbpedia');
+        if (this.isZoomInfo)
+            selectedDataSources.push('zoominfo');    
+        console.log('query ',this.defaultTextVal);
+       //  console.log('dataSource',JSON.stringify(selectedDataSources));
+
+        graphResponse({ leadIds: this.leadIds.split(','), queryData: this.defaultTextVal, dataSources: selectedDataSources, naicValue: this.NaicKey, sicValue: this.SicKey })
             .then(result => {
                 console.log('result#' + JSON.stringify(result));
                 this.leads = result;
-                this.showSpinner = false;
-               
-                this.leads.forEach((item, index) => {
-                    item.isSelected = false;
-                    item.dataSourceStatus = item.options[0];
+              //  console.log('lead lengths',this.leads.length);
 
+                this.leads.forEach((item, index) => {
+                    // item.isSelected = false;
+                    item.dataSourceStatus = item.options[0];
+                    this.defaultChecked = item.defaultChecked;
                     let options = item.options;
                     item.options = [];
-
+  
                     options.forEach((option, index) => {
                         item.options.push({ label: option, value: option });
                     });
-                  
-                });
-            
-                console.log('leads = ' + JSON.stringify(this.leads));
 
+                });
+
+                this.searchable = [];
+
+                this.leads.forEach((item, index) => {
+                    if(index < this.pageSize)
+                        this.searchable.push(item);
+                });
+               
+                this.showSpinner = false;
+                
             }).catch(error => {
-                console.log('error#' + error);
+                console.log('error#' + JSON.stringify(error));
+                this.showSpinner = false;
             });
-        
-        this.showData = true;
-        this.isModalOpen = false;
+
+        this.showData = 'slds-show';
+        this.isModalOpen = 'slds-hide';
     }
 
 
+    handlePrevNext(event) {
+        this.pageNo = event.target.name == 'prev' ? this.pageNo - 1 : this.pageNo + 1;
+
+        this.searchable = this.leads.slice((this.pageNo - 1) * this.pageSize, this.pageNo * this.pageSize);
+    }
+
     handleCheckboxChange(event) {
-        this.leads[event.target.dataset.id].isSelected = (event.target.checked ? true : false);
+        //console.log('event.target.dataset.id = ' + event.target.dataset.id);
+    
+        this.leads.forEach((item, index) => {
+            if(item.id == event.target.dataset.id)
+                item.defaultChecked = (event.target.checked ? true : false);
+        });
+        
+    
     }
 
     handleStatusChange(event) {
-        console.log('event.target.dataset.id = ' + event.target.dataset.id);
         this.leads[event.target.dataset.id].dataSourceStatus = event.target.value;
-        console.log('datasource ',this.leads[event.target.dataset.id].dataSourceStatus);
+        // console.log('datasource ',this.leads[event.target.dataset.id].dataSourceStatus);
     }
-
-    handleOneTime(event) {
-        console.log(event.target.value);
-    }
-
-    handleOngoing(event) {
-        console.log(event.target.value);
-    }
-
 
 
     handleSave() {
         let leads = [];
-      this.showSpinner = true;
+        this.showSpinner = true;
         this.leads.forEach((item, index) => {
-            if (item.isSelected) {
+            if (item.defaultChecked) {
                 let values = item.dataSourceStatus.split(' | ');
-
-                if(values[1] != 'NOT_CLASSIFIED') {
+                // console.log('not classified pass ',JSON.stringify(values[0]));
+                if (values[0] != 'NOT_CLASSIFIED') {
                     leads.push({
-                        "Id": item.id, "Status": values[1], "zeniadev__Datasource__c": values[0] , "zeniadev__SICCode__c": item.SicCode , "zeniadev__Niacs_Code__c" : item.NaicCode , "Industry": item.industry
+                        // "Id": item.id, "Status": values[1], "zeniadev__Datasource__c": values[0], "zeniadev__SICCode__c": item.SicCode, "zeniadev__Niacs_Code__c": item.NaicCode, "Industry": item.industry
+                     "Id": item.id, "Status": values[1], "zeniadev__Datasource__c": '', "zeniadev__SICCode__c": item.SicCode, "zeniadev__Niacs_Code__c": item.NaicCode, "Industry": item.industry, 
+                      "zeniadev__Annual_Growth__c": item.annual_growth, "zeniadev__No_Of_Employees__c" : item.no_of_employees, "zeniadev__Operating_Years__c" : item.operating_years, "zeniadev__Quarterly_Growth__c" :item.quarterly_growth
+
                     });
                 }
-                console.log('leads for push '+JSON.stringify(this.leads));
+                //  console.log('leads for push ' + JSON.stringify(this.leads));
             }
         });
 
-        if(leads.length > 0) {
+        if (leads.length > 0) {
             saveLeads({ leads: leads })
                 .then(result => {
                     if (result == 'Success')
@@ -224,9 +323,23 @@ export default class LeadEnablerCmp extends NavigationMixin(LightningElement) {
                     else console.log(result);
                     this.showSpinner = false;
                 }).catch(error => {
-                    console.log('error#' + error); 
+                    console.log('error#' + JSON.stringify(error));
                 });
         } else window.open('/lightning/o/Lead/list?filterName=zeniadev__ZeniaGraphListView', '_self');
+    }
+
+
+
+     get isDisplayNoRecords() {
+        var isDisplay = true;
+        if(this.leads){
+            if(this.leads.length == 0){
+                isDisplay = true;
+            }else{
+                isDisplay = false;
+            }
+        }
+        return isDisplay;
     }
 
 }

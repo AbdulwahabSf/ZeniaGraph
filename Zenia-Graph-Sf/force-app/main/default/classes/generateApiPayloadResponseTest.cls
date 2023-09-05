@@ -46,7 +46,7 @@ public class generateApiPayloadResponseTest implements HttpCalloutMock {
     public HTTPResponse respond(HTTPRequest request) {
         HttpResponse response = new HttpResponse();
         response.setHeader('Content-Type', 'application/json');
-        response.setBody('{"data":{"getCompaniesByStatus":[{"name":"Apple","industry":"RealEstate","status":"ACTIVE","source":"linkedin","profit":"336100000","SIC":6141,"NAICS":522291}]}}');
+        response.setBody('{"data":{"getCompaniesByStatus":[{"name":"Apple","industry":"RealEstate","status":"ACTIVE","source":"linkedin","profit":"336100000","SIC":"6141,6765","NAICS":"522291,871691"}]}}');
         response.setStatusCode(200);
         return response; 
     }

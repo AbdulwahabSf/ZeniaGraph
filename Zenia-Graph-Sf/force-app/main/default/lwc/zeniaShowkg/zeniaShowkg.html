@@ -1,15 +1,24 @@
 <!-- sldsValidatorIgnore -->
 <!-- sldsValidatorIgnore -->
 <template>
+ 
+     <template if:true={showEmptyErr}>
+		 	<div class=" slds-text-color_error slds-page-header__title slds-align_absolute-center">
+			No Records Found</div>
+			<br>
+        <lightning-button class="slds-align_absolute-center" variant="brand" label="Go Back" onclick={goToListView}></lightning-button>
+     </template>
+    <template if:true={isLoading}>
+        <lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>     
+    </template>
+
       <template if:true={showError}>
-      <div class=" slds-text-color_error slds-text-color_error slds-text-heading_medium slds-align_absolute-center">Please Select A Record</div>
+      <div class="slds-text-color_error  slds-page-header__title slds-align_absolute-center">Please Select A Record</div>
       <br>
       <div class="slds-align_absolute-center">
         <lightning-button variant="brand" label="Go Back" onclick={goToListView}></lightning-button>
       </div>
- </template>
+      </template>
 
-      <template if:true={showData}>
-        <lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>     
-    </template>
+      
 </template>

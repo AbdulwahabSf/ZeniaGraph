@@ -1,89 +1,188 @@
 <template>
-	<template if:true={isModalOpen}>
-		<div class="slds-grid slds-gutters slds-p-top_xx-large  slds-p-left_xx-large slds-p-right_xx-large">
-			<div class="slds-col slds-size_2-of-3 ">
-				<span>
-				<div class="slds-scrollable_y" style="height:40rem;">
-					<lightning-textarea name="input2" label="Default Config" value={initialvalue} onchange={handleDefaultText}></lightning-textarea>
+
+	<div class={isModalOpen}>
+		<lightning-input class="slds-align_absolute-center slds-text-align_center slds-text-heading_medium"
+			type="toggle" message-toggle-active="Advance" message-toggle-inactive="Basic" onchange={handleToggle}>
+		</lightning-input>
+
+		<div class="slds-grid slds-gutters slds-p-left_xx-large slds-p-right_xx-large">
+
+			<div class={isAdvanceArea}>
+				<div class="">
+					<span>
+					<lightning-input-rich-text class="nameCls" name="input2" label="Default Config" value={initialvalue} pattern="^\S.*\S$" message-when-bad-input="Special Characters not allowed" onchange={handleDefaultText}>
+					</lightning-input-rich-text>	
+				</span>
 				</div>
-			</span>
 			</div>
-			<div class="slds-col slds-size_1-of-3">
-			 <span>
-          <div class="headingclr slds-m-bottom_small"> Settings</div>
-          <div class="slds-text-heading_small">Select how frequently you'd like to run this query.</div>
-          <lightning-input type="radio" name="query" label="One Time" value="One Time" checked="" onchange={handleOneTime}></lightning-input>
-          <lightning-input class="slds-m-bottom_x-small" type="radio" name="query" label="Ongoing" value="Ongoing" onchange={handleOngoing}></lightning-input>
-          <div class="slds-form-element slds-m-bottom_x-small">
-            <div class="slds-form-element__control">
-              <div class="slds-select_container">
-                <select class="slds-select" id="select-01">
-                  <option value="">Select frequency</option>
-                  <option>frequency One</option>
-                  <option>frequency Two</option>
-                </select>
-              </div>
+			<div class={isBasicArea}>
+				<div class="slds-col slds-size_2-of-3 ">
+					<span>
+			<div class="custom-box">
+			<b><p>ACTIVE</p></b>
+			<div class="slds-grid slds-wrap slds-m-top_small ">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element input-height">
+						<lightning-input data-id="plusOpp" type="text" value={plusOpp} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element  ">
+						{OperatingBusiness}
+					</div>
+				</div>
+			</div>
+
+			<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+							<lightning-input data-id="posEmpNumber" type="text" value={posEmpNumber} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element ">
+						{employees}
+					</div>
+				</div>
+			</div>
+
+			<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+						<lightning-input data-id="growthQuar" type="text"  value={growthQuar} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element ">
+					{growthQuarterly}
+					</div>
+				</div>
+			</div>
+
+
+		<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element ">
+						<lightning-input data-id="growthYrly" type="text" value={growthYrly}  onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 slds-m-bottom_medium ">
+					<div class="slds-form-element  ">
+					{growthYearly}
+					</div>
+				</div>
+			</div>
+
+			<b><p>INACTIVE</p></b>
+			<div class="slds-grid slds-wrap slds-m-top_small">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+						<lightning-input data-id="negOpp" type="text" value={negOpp} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element ">
+						{OperatingBusiness}
+					</div>
+				</div>
+			</div>
+
+			<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+						<lightning-input data-id="negEmpNumber" type="text" value={negEmpNumber} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element ">
+			    	{employees}
+					</div>
+				</div>
+			</div>
+
+				<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+						<lightning-input data-id="negGrowthQuar" type="text" value={negGrowthQuar} onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6 ">
+					<div class="slds-form-element ">
+			    	{growthQuarterly}
+					</div>
+				</div>
+			</div>
+
+				<div class="slds-grid slds-wrap">
+				<div class="slds-p-horizontal--small slds-col slds-size_1-of-6 ">
+					<div class="slds-form-element">
+						<lightning-input data-id="negGrowthYrly" type="text" value={negGrowthYrly}  onchange={HandleCriteriaChange}>
+						</lightning-input>
+					</div>
+				</div>
+				<div class="slds-text-heading_small slds-col slds-size_4-of-6">
+					<div class="slds-form-element  ">
+			    	{growthYearly}
+					</div>
+				</div>
+			</div>
+            <div class="slds-m-top_small">   
+			<b><p>OTHERS</p></b>
             </div>
-          </div>
-          <div class="slds-text-heading_small slds-m-bottom_xx-small">Time</div>
-          <lightning-input type="search" class="slds-m-bottom_small"></lightning-input>
-          <div class="slds-text-heading_small">Data Sources Selection</div>
-          <lightning-input type="checkbox" data-id="linkedin" label="LinkedIn" value="linkedin" onchange={handleChange}></lightning-input>
-          <lightning-input type="checkbox" data-id="zoominfo" label="ZoomInfo" value="zoominfo" onchange={handleChange}></lightning-input>
-          <div class="slds-text-heading_small slds-m-bottom_xx-small">Industry Classification Search Filter</div>
-          <div class="slds-grid slds-gutters">
-            <div class="slds-col">
-              <span>
-                <lightning-input type="radio" name="radiobutton" data-id="NAICS" label="NAICS Code" value="option1" onclick={handleCode}></lightning-input>
-              </span>
+			<div class= "slds-text-heading_small  slds-xx-top_small">
+			<p>{OthersText}</p>
 			</div>
-			<div class="slds-col">
+		</div>
+		</span>
+				</div>
+			</div>
+
+			<div class="slds-col slds-size_1-of-3">
 				<span>
-                <lightning-input type="radio" name="radiobutton" data-id="SIC" label="SIC Code" value="option2" onclick={handleCode}></lightning-input>
-              </span>
-			</div>
-			<div class="slds-col">
-				<span>
-                <lightning-input class="slds-m-bottom_x-small" name="radiobutton" type="radio" data-id="None" label="None" value="option3" checked="" onclick={handleCode}></lightning-input>
-              </span>
+					<div class="headingclr "> Settings</div>
+					<!-- <div class="slds-text-heading_small">Data Sources Selection</div>
+					<lightning-input type="checkbox" data-id="linkedin" label="LinkedIn" onchange={handleChange} checked={isLinkedIn}></lightning-input>
+					<lightning-input type="checkbox" data-id="dbpedia" label="DBPedia" onchange={handleChange} checked={isDBPedia}></lightning-input>
+					<lightning-input type="checkbox" data-id="zoominfo" label="ZoomInfo" onchange={handleChange} checked={isZoomInfo}></lightning-input> -->
+					<div class="slds-text-heading_small slds-m-bottom_xx-small slds-m-top_xx-small">Industry Classification Search Filter</div>
+					<lightning-radio-group class= "slds-m-bottom_x-small" name="radioGroup" label="" options={classifyoptions} value={classifyValue} type="radio" onchange={handleRadioChange}></lightning-radio-group>
+					<div class="slds-combobox_container" if:true={displayNIAC}>
+						<c-custom-lookup show-label="false" search-placeholder="Search for NAICS" onlookupitemselected={handleLookupItemSelected} data-id="NIAC"></c-custom-lookup>
+					</div>
+					<div class="slds-combobox_container" if:true={displaySIC}>
+						<c-custom-lookup show-label="false" search-placeholder="Search for SIC" onlookupitemselected={handleLookupItemSelected} data-id="SIC"></c-custom-lookup>
+					</div>
+					<div class="slds-text-heading_small ">Available Criteria's: </div>
+					<div class="font-color">Years of operating business, employees, growth quarterly, growth yearly</div>
+				</span>
 			</div>
 		</div>
-		<div class="slds-combobox_container" if:true={displayNIAC}>
-			<c-custom-lookup show-label="false" search-placeholder="Search for NAIC" onlookupitemselected={handleLookupItemSelected} data-id="NIAC">
-			</c-custom-lookup>
-		</div>
-		<div class="slds-combobox_container " if:true={displaySIC}>
-			<c-custom-lookup show-label="false" search-placeholder="Search for SIC" onlookupitemselected={handleLookupItemSelected} data-id="SIC" >
-			</c-custom-lookup>
-			</div>
-		<div class="slds-text-heading_small slds-m-bottom_x-small ">Available Criteria's: </div>
-		<div class="  font-color">Years of operating business, employees, investment funding, growth quaterly, growth
-			yearly</div>
-			</span>
-		</div>		
-		</div>
-		
+
+		</br>
+		</br>
 		<div class="slds-p-left_xx-large">
 			<button class="slds-button slds-button_brand " onclick={submitDetails} title="OK">Submit</button>
-			<!--	<lightning-button-menu class="slds-m-left_medium" alternative-text="Show menu" variant="border-filled"
-					icon-name="utility:settings"></lightning-button-menu><lightning-button-icon class="slds-m-left_medium" variant="base" size="medium"
-					icon-name="utility:delete" alternative-text="delete"></lightning-button-icon><lightning-button-icon class="slds-m-left_medium" variant="base" size="medium" icon-name="utility:edit"
-					alternative-text="edit"></lightning-button-icon><lightning-button-icon class="slds-m-left_medium" variant="base" size="medium"
-					icon-name="utility:refresh" alternative-text="refresh"></lightning-button-icon> -->
 		</div>
-	</template>
-	<template if:true={showData}>
+	</div>
+
+
+
+	<div class={showData}>
 		<b>
-      <h3 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate slds-align_absolute-center">Lead Selection</h3>
-    </b>
-	<div if:true={showSpinner} class="slds-is-relative">
-                    <lightning-spinner
-                        alternative-text="Loading..." variant="brand">
-                    </lightning-spinner>
-                </div>
-  
+        	 <h3 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate slds-align_absolute-center">Lead Selection</h3>
+      	</b>
+		<div if:true={showSpinner} class="slds-is-relative">
+			<lightning-spinner alternative-text="Loading..." variant="brand"></lightning-spinner>
+		</div>
 		<div class="">
-			<table class="slds-table slds-table_cell-buffer slds-table_bordered ">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
 				<thead>
 					<tr class="slds-line-height_reset">
 						<th class="" scope="col">
@@ -92,7 +191,7 @@
 							</div>
 						</th>
 						<th class="" scope="col">
-							<div class="slds-truncate" title="Company">Company</div>
+							<div class="slds-truncate"  title="Company">Company</div>
 						</th>
 						<th class="" scope="col">
 							<div class="slds-truncate" title="Company">Industry</div>
@@ -103,17 +202,32 @@
 						<th class="" scope="col">
 							<div class="slds-truncate" title="Company">NAICS Code</div>
 						</th>
-						<th class="" scope="col">
+						<!-- <th class="" scope="col">
 							<div class="slds-truncate" title="Email">Data Source Status</div>
+						</th> -->
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Operating Years">Operating Years</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="No. of Employees">No. Of Employees</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Quarterly Growth ">Quarterly Growth(bn)</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Annual Growth">Annual Growth(bn)</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Email">Status</div>
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					<template for:each={leads} for:item="ld" for:index="index">
+					<template for:each={searchable} for:item="ld" for:index="index">
 						<tr key={ld.id}>
 							<td scope="col">
 								<div>
-									<lightning-input type="checkbox" checked={ld.isSelected} data-id={index}
+									<lightning-input type="checkbox" checked={ld.defaultChecked} data-id={ld.id}
 										onchange={handleCheckboxChange}></lightning-input>
 								</div>
 							</td>
@@ -130,34 +244,66 @@
 								<div>{ld.NaicCode}</div>
 							</td>
 							<td scope="col">
-								<lightning-combobox name="progress" value={ld.dataSourceStatus} placeholder="Source"
+								<div>{ld.operating_years}</div>
+							</td>
+							<td scope="col">
+								<div>{ld.no_of_employees}</div>
+							</td>
+							<td scope="col">
+								<div>{ld.quarterly_growth}</div>
+							</td>
+							<td scope="col">
+								<div>{ld.annual_growth}</div>
+							</td>
+							<td scope="col">
+								<div>{ld.Status}</div>
+								<!-- <lightning-combobox name="progress" value={ld.dataSourceStatus} placeholder="Source"
 									data-id={index} options={ld.options} onchange={handleStatusChange}>
-								</lightning-combobox>
+								</lightning-combobox> -->
 							</td>
 						</tr>
 					</template>
 				</tbody>
 			</table>
-			<footer class="slds-modal__footer">
+
+			<template if:true={isDisplayNoRecords}>
+				<div class="slds-align_absolute-center">
+					<br/>
+                    No company records found
+                </div>
+			</template>
+
+			<br/>
+			
+			<div class="slds-align_absolute-center">
+				<div class="slds-p-right_xx-small">
+
+					<lightning-button label="" icon-name="utility:chevronleft" name="prev" variant="base" onclick={handlePrevNext} disabled={disablePrev}> 
+					</lightning-button>
+				</div>
+				<span class="slds-badge slds-badge_lightest">
+    
+					<b>Page {pageNo} of {lastPage}</b>
+                </span>
+				<div class="slds-p-left_xx-small">
+				
+					<lightning-button label=""  icon-name="utility:chevronright" name="next" variant="base" onclick={handlePrevNext} disabled={disableNext}>
+					</lightning-button>
+				</div>
+			</div>
+
+		
 				<div class="slds-grid slds-gutters slds-align_absolute-center">
 					<div class="slds-m-top_small slds-m-left_x-small">
 						<span>
-              <lightning-button label="Previous" variant="brand-outline" onclick={handlePrevious}></lightning-button>
-            </span>
+                     <lightning-button label="Previous" variant="brand-outline" onclick={handlePrevious}></lightning-button>
+                  </span>
 					</div>
 					<div class="slds-m-top_small slds-m-left_x-small">
 						<lightning-button label="Save Leads" variant="brand" onclick={handleSave}></lightning-button>
 					</div>
 				</div>
-			</footer>
-		</div>
-
 		
-
-
-
-	</template>
-
-
-
+		</div>
+	</div>
 </template>

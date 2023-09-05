@@ -14,6 +14,10 @@
     background-color: #f4f6f9;
     padding: 1rem;
     border: 1px solid #d8dde6;
+    width: 702px;
+    padding-left: 20px;
+    height: 555px;
+    font-size: 18px;
 }
 
 .position{
@@ -35,4 +39,31 @@
 
 :host {
     --slds-c-textarea-sizing-min-height: 500px;
+}
+
+:host {
+    --slds-rich-text-editor__toolbar: 500px;
+}
+
+
+
+.THIS .topText textarea {
+   border-color: #020202;
+   height:73px;
+}
+
+.div-block{
+    border: solid rgb(0, 183, 255) 2px;
+    padding:2rem;
+}
+
+.left-align {
+    text-align: left;
+}
+.right-align {
+    text-align: right;
+}
+
+.font-size{
+    font-size: 18px;
 }

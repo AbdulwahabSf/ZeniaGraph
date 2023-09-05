@@ -1,4 +1,4 @@
-@RestResource(urlMapping='/api/lead')
+@RestResource(urlMapping='/api/CreateLead/*')
 global class zeniaGraphRestApiLead {
    @HttpPost
    global static map<String,String> createLead(){
@@ -13,9 +13,9 @@ global class zeniaGraphRestApiLead {
        
        String jsonBody = req.requestBody.toString();
        system.debug('json body '+jsonBody);
-       Map<String,Object> requestData = (Map<String,Object>) JSON.deserializeUntyped(jsonBody);
+      // Map<String,Object> requestData = (Map<String,Object>) JSON.deserializeUntyped(jsonBody);
        
-      /* JSONParser parser = JSON.createParser(jsonBody);
+       JSONParser parser = JSON.createParser(jsonBody);
       While(parser.nextToken()!=null){
            if(parser.getCurrentToken() != JSONToken.END_OBJECT){
                fieldName = parser.getCurrentName();
@@ -44,15 +44,15 @@ global class zeniaGraphRestApiLead {
                }
                
            }
-       }*/      
+       }      
             Lead lds = new Lead();
-            lds.Company= (String) requestData.get('company');
-            lds.industry= (String)requestData.get('industry');
-            lds.Status = (String)requestData.get('status'); 
-            lds.Datasource__c = (String) requestData.get('datasource');
-            lds.SICCode__c =(String) requestData.get('sicCode');
-            lds.Niacs_Code__c =(String) requestData.get('niacCode');
-            lds.LastName = (String) requestData.get('lastName');
+            lds.Company= company;
+            lds.industry= industry;
+            lds.Status = status; 
+            lds.Datasource__c = datasource;
+            lds.SICCode__c =sicCode;
+            lds.Niacs_Code__c =niacCode;
+            lds.LastName = lastName;
             insert lds;
             ldids = lds.Id;
             system.debug('ID IS = '+ ldids);

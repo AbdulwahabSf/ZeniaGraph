@@ -4,30 +4,54 @@ import showkgcompany from '@salesforce/apex/zeniaShowKgResponseHandler.showkgcom
 
 export default class ZeniaShowkg extends LightningElement {
     @api recordId;
-
     response;
     @api leadIds;
-    @api leadList;
-    @track showData = true;
+    @api leadIdList;
+    isLoading = true;
     showError = false;
+    showEmptyErr = false;
+
     connectedCallback() {
         setTimeout(() => {
-            console.log('this.recordId', this.recordId);
-            if (this.leadIds && this.leadIds.length > 0) {
-                this.leadList = this.leadIds.split(',');
-            } else if(this.recordId){
-                this.leadList = [];
-                this.leadList.push(this.recordId);
-            }
+            this.init();
+        }, 1000);
+        
+    }
+
+     init() {
+
+     //  console.log('this.recordId = ', this.recordId);
+
+       this.leadIdList = [];
+       if (this.leadIds && this.leadIds.length > 0) {
+            this.leadIdList = this.leadIds.split(',');
+        } else if(this.recordId) {
+            this.leadIdList.push(this.recordId);
+        }
+       if(this.leadIdList.length > 0 ) {
+            this.isLoading = false;
+            this.initHandler();
+        }
+
+        if(this.leadIdList.length == 0){
+            this.showError = true;
+            this.isLoading = false;
+        }
+
+    }
 
 
-            console.log('SELECTED IDS', JSON.stringify(this.leadList));
-            if (this.leadList && this.leadList.length > 0) {
-                showkgcompany({ leadIds: this.leadList }).then(response => {
+    initHandler() {
+           
+           // console.log('SELECTED IDS', JSON.stringify(this.leadIdList));
+            if (this.leadIdList && this.leadIdList.length > 0) {
+                showkgcompany({ leadIds: this.leadIdList }).then(response => {
                     this.response = JSON.parse(response);
                     console.log('response', this.response.data);
+                     this.isLoading = false;
+                     
                     window.open(this.response.data.showGraphDbKg[0].graph_url, '_blank');
-
+    
                     if (this.leadIds && this.leadIds.length > 0) {
                         this.goToListView();
                     } else {
@@ -39,13 +63,17 @@ export default class ZeniaShowkg extends LightningElement {
                 });
                 
             } else {
+                this.showEmptyErr = true;
                 this.showData = false;
                 this.showError = true;
             }
-        }, 100);
+        }
 
-    }
     goToListView() {
+    if(!this.recordId){
         window.open('/lightning/o/Lead/list?filterName=zeniadev__ZeniaGraphListView', '_self');
+    }else{
+          this.dispatchEvent(new CloseActionScreenEvent());
+    }
     }
 }
