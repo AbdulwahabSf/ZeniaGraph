@@ -1,20 +1,50 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import NlpSearchPrompt from '@salesforce/apex/zeniaNLPPrompt.getClassifiedData';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class ZeniaNLPPrompt extends LightningElement {
 
-  initialvalue = 'find me the profit, current year revenue and last quarterly revenue for Apple';
+  @track initialvalue = 'find me the profit, current year revenue and last quarterly revenue for Apple';
   displayContent = false;
   isLoading = false;
   showKGUrl;
   showKgCompanies = [];
   columns = [];
   data = [];
+  noRec = false;
+
+
+  //voice to text 
+  _recognition;
+
+  connectedCallback() {
+    window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    if ("SpeechRecognition" in window) {
+      this._recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+      this._recognition.lang = 'en-US';
+      //this._recognition.continuous = true;
+
+    }
+  }
+
+  handleClick(event) {
+  
+    this._recognition.start();
+    //When a result has been successfully recognized, the result event fires
+    this._recognition.onresult = (event) => {
+      const msg = event.results[0][0].transcript;
+      this.handleSpeechRecognized(msg);
+    }
+  }
+  handleSpeechRecognized(msg) {
+    this.initialvalue = '';
+    this.initialvalue = msg;
+    
+  }
 
   submitSearchHandler(event) {
 
-    let userInput = this.template.querySelector('lightning-textarea[data-id="userinputText"]');
+    let userInput = this.template.querySelector('textarea[data-id="userinputText"]');
     if (userInput && userInput.value) {
       this.fetchUserInp(userInput.value);
       // userInput.value = '';
@@ -32,27 +62,24 @@ export default class ZeniaNLPPrompt extends LightningElement {
   fetchUserInp(query) {
     this.isLoading = true;
     NlpSearchPrompt({ inputText: query }).then(response => {
-      console.log('response' + response);
       let graphResponse = JSON.parse(response);
       this.showKgUrl = '';
       this.showKgCompanies = [];
-      // this.companyList = [];
-      if (graphResponse.data.getGraphResultsByNLPQuery.graph_url) {
+      let result = graphResponse.data.getGraphResultsByNLPQuery.graph_url;
+      if (result != null) {
         this.showKGUrl = graphResponse.data.getGraphResultsByNLPQuery.graph_url;
-        // console.log('this.showKgUrl = '+ this.showKGUrl);
         this.showKgCompanies = graphResponse.data.getGraphResultsByNLPQuery.records;
-        // console.log('showKgCompanies ='+this.showKgCompanies);
-        this.processRecords(graphResponse.data.getGraphResultsByNLPQuery.records);
-
-        this.isLoading = false;
+        this.processRecords(this.showKgCompanies);
         this.displayContent = true;
+        this.isLoading = false;
+        this.noRec = false;
       } else {
         this.isLoading = false;
+        this.noRec = true;
         this.displayContent = false;
       }
-
     }).catch(error => {
-      console.log('Error', error);
+     // console.log('Error', error);
       this.isLoading = false;
     });
   }
@@ -63,16 +90,14 @@ export default class ZeniaNLPPrompt extends LightningElement {
   }
 
   processRecords(records) {
-    console.log('inside processRecords');
+
     let columns = [];
     let data = [];
-    
-    if(records && records.length > 0) {
-      records.forEach(function (item) {
-        for(const key in item) {
-          console.log('key = ' + key + ', value = ' + item[key]);
 
-          if(item[key] && item[key] != '' && !columns.includes(key)) {
+    if (records && records.length > 0) {
+      records.forEach(function (item) {
+        for (const key in item) {
+          if (item[key] && item[key] != '' && !columns.includes(key)) {
             columns.push(key);
           }
         }
@@ -80,11 +105,9 @@ export default class ZeniaNLPPrompt extends LightningElement {
 
       records.forEach(function (item) {
         let values = [];
-          
-        for(const key in item) {
-          console.log('key = ' + key + ', value = ' + item[key]);
 
-          if(columns.includes(key)) {
+        for (const key in item) {
+          if (columns.includes(key)) {
             values.push((item[key] ? item[key] : ''));
           }
         }
@@ -92,26 +115,18 @@ export default class ZeniaNLPPrompt extends LightningElement {
       });
     }
 
-    if(columns) {
+    if (columns) {
       columns.forEach((item, index) => {
         let strList = item.split('_');
-        
+
         strList.forEach((str, index1) => {
           strList[index1] = str.charAt(0).toUpperCase() + str.slice(1);
-          console.log('str = ' + str);
         });
 
         columns[index] = strList.join(' ');
-        console.log('item = ' + item);
       });
     }
-
     this.columns = columns;
     this.data = data;
-    
-    console.log('this.columns = ' + JSON.stringify(this.columns));
-    console.log('this.data = ' + JSON.stringify(this.data));
   }
-
-
 }

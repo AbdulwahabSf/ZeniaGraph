@@ -1,33 +1,42 @@
 <template>
 
 	<div class="slds-grid slds-gutters" style="padding-left:12px;">
-		<div class="slds-col slds-col slds-size_10-of-12">
-			<span><lightning-textarea type="text" variant="standard" data-id="userinputText" label="Enter Query"
-					placeholder="Enter your query here..." disabled={isLoading} value={initialvalue} >
-				  </lightning-textarea></span>
+		<div class="slds-col slds-col slds-size_3-of-4">
+			<span><div class="slds-form-element">
+            <label class="slds-form-element__label" for="text-input-id-4">Enter Query</label>
+            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                <lightning-icon size="x-small" style="top:15px" class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" icon-name="utility:unmuted" onclick={handleClick}></lightning-icon>
+                <textarea id="text-input-id-4" variant="standard" data-id="userinputText" 
+					placeholder="Enter your query here..." disabled={isLoading}  class="slds-textarea" >{initialvalue}</textarea>
+            </div>
+            </div>
+				</span>
 		</div>
 		<div class="slds-col slds-size_1-of-12" style="padding-top:20px;">
-			<span><lightning-button variant="brand" label="Search" title="Search" onclick={submitSearchHandler}>
-				  </lightning-button></span>
+			<span><lightning-button variant="brand-outline" label="Search" title="Search" onclick={submitSearchHandler}>
+				  </lightning-button>
+				  </span>
 		</div>
+		    <template if:true={displayContent}>
+					<div class="slds-col slds-size_1-of-12 slds-m-left_x-small" style="padding-top:20px;">
+							<span><lightning-button label="ShowKG"  variant="brand" onclick={openShowKg}>
+	            	</lightning-button></span>
+	 					</div>
+						</template>
 		<div if:true={isLoading} class="slds-is-relative slds-spinner_brand loadingSpinner">
 			<lightning-spinner alternative-text="Loading"></lightning-spinner>
 		</div>
 	</div>
+	
 	<template if:true={displayContent}>
-		<!-- <a href={showKgUrl} style ="padding-left:600px;" target="_blank">ShowKG</a>  -->
 		<div class="slds-grid slds-gutters">
    <div class="slds-col slds-size_2-of-3">
     <span></span>
    </div>
-   <div class="slds-col slds-size_1-of-3">
-    <span><lightning-button label="ShowKG"  variant="brand-outline" onclick={openShowKg}>
-		</lightning-button></span>
-    </div>
     </div>
 		
 		<div class="slds-scrollable "
-			style="height:10rem;width:44rem;padding-left:12px;" tabindex="0">
+			style="height:10rem;width:40rem;padding-left:12px;" tabindex="0">
 			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
 				<thead>
 					<tr class="slds-line-height_reset">
@@ -54,4 +63,9 @@
 			</table>
 		</div>
 	</template>
+	<template if:true={noRec}>
+		<div class=" slds-text-color_error slds-text-heading_small slds-m-left_medium slds-m-top_medium">
+			No Records Found</div>
+	</template>
+
 </template>

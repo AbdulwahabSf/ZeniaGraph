@@ -19,9 +19,6 @@ export default class ZeniaShowkg extends LightningElement {
     }
 
      init() {
-
-     //  console.log('this.recordId = ', this.recordId);
-
        this.leadIdList = [];
        if (this.leadIds && this.leadIds.length > 0) {
             this.leadIdList = this.leadIds.split(',');
@@ -42,12 +39,10 @@ export default class ZeniaShowkg extends LightningElement {
 
 
     initHandler() {
-           
-           // console.log('SELECTED IDS', JSON.stringify(this.leadIdList));
+
             if (this.leadIdList && this.leadIdList.length > 0) {
                 showkgcompany({ leadIds: this.leadIdList }).then(response => {
                     this.response = JSON.parse(response);
-                    console.log('response', this.response.data);
                      this.isLoading = false;
                      
                     window.open(this.response.data.showGraphDbKg[0].graph_url, '_blank');
@@ -59,7 +54,7 @@ export default class ZeniaShowkg extends LightningElement {
                     }
 
                 }).catch(error => {
-                    console.log('Error', error);
+                   // console.log('Error', error);
                 });
                 
             } else {

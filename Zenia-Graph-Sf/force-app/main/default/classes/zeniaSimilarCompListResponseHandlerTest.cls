@@ -1,19 +1,21 @@
 @istest
 public class zeniaSimilarCompListResponseHandlerTest implements HttpCalloutMock{
     
-    @testSetup static void setup() {
-        Zenia_API_Service__c zasObj = new Zenia_API_Service__c();
-        zasObj.Endpoint__c = 'test';
-        zasObj.Header__c = 'application/json';
-        zasObj.Method__c = 'POST';
-        insert zasObj;
-        
+    @testSetup static void setup() {      
         Lead lobj = new Lead();
         lobj.LastName = 'TestLn1';
         lobj.Company = 'TestCompany';
-        insert lobj;
-        
-        
+        insert lobj;   
+    }
+    
+    static testMethod void testSaveLeads() {
+      List<lead> leads = [select id,Company from Lead limit 1];
+          system.debug('leads'+leads);
+        Test.setMock(HttpCalloutMock.class, new zeniaSimilarCompListResponseHandlerTest());
+        Test.startTest();
+        zeniaSimilarCompanyListResponseHandler.saveLeads(leads);
+      
+        Test.StopTest();      
     }
     
     static testMethod void testsimilarCompanyList(){
@@ -27,8 +29,6 @@ public class zeniaSimilarCompListResponseHandlerTest implements HttpCalloutMock{
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new zeniaSimilarCompListResponseHandlerTest());  
         map<string,object> similarcomp = zeniaSimilarCompanyListResponseHandler.similarCompanyList(leadIds,'graph');
-       // zeniaSimilarCompanyListResponseHandler.displayContacts('Amazon.com, inc.');
-       // zeniaSimilarCompanyListResponseHandler.saveLeads(leads);
         Test.stopTest();
     }
     

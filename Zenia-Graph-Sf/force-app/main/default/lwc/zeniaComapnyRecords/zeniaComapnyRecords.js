@@ -5,9 +5,9 @@ import similarCompanyList from '@salesforce/apex/zeniaSimilarCompanyListResponse
 import saveLeads from '@salesforce/apex/zeniaSimilarCompanyListResponseHandler.saveLeads';
 import displayContacts from '@salesforce/apex/zeniaSimilarCompanyListResponseHandler.displayContacts';
 import showContacts from 'c/customModel';
-import { CurrentPageReference } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 
-export default class ZeniaComapnyRecords extends LightningElement {
+export default class ZeniaComapnyRecords extends NavigationMixin(LightningElement) {
     
     fixedWidth = "width:15rem;";
 
@@ -28,7 +28,46 @@ export default class ZeniaComapnyRecords extends LightningElement {
     @track contactData = [];
    currentPageReference = null; 
    showEmptyErr = false;
-    
+    @track pageNo = 1;
+    @track pageSize = 10;
+    @track searchable = [];
+
+    @track sicOptions = [];
+    @track naicOptions = [];
+    @track industryOptions = [];
+    @track vectorScoreOptions = [];
+
+   @track selSIC = [];
+   @track selNAICS = [];
+   @track selIndustry = [];
+   @track selVectorScore;
+   
+   @track vectorBwFrom;
+   @track vectorBwTo;
+   @track vectorFrom;
+
+    operatorOptions = [
+        { label: '--None--', value: '' },
+        { label: 'Between', value: 'Between' },
+        { label: 'Greater Than', value: 'Greater Than' },
+        { label: 'Less Than', value: 'Less Than' },
+        { label: 'Equal to', value: 'Equal to' },
+        { label: 'Greater Than Equal To', value: 'Greater Than Equal To' },
+        { label: 'Less Than Equal To', value: 'Less Than Equal To' }
+    ];
+    get tableData() {
+        return this.searchable.slice((this.pageNo - 1) * this.pageSize, this.pageNo * this.pageSize);
+    }
+   get lastPage() {
+       return Math.ceil(this.searchable.length / this.pageSize);
+    }
+     get disablePrev() {
+        return this.pageNo == 1;
+    }
+      get disableNext() {
+       return this.pageNo == Math.ceil(this.searchable.length / this.pageSize);
+    }
+
     columns = [
         { label: 'Company', fieldName: 'Company' },
         { label: 'Contact Person', fieldName: 'Name' },
@@ -43,12 +82,18 @@ export default class ZeniaComapnyRecords extends LightningElement {
     getPageReferenceParameters(currentPageReference){
      if (currentPageReference.type === "standard__quickAction") {
       let quickActionPath = currentPageReference.attributes.apiName;
-     // console.log('quick Action Name'+quickActionPath);
       let envValue = quickActionPath.split("zeniadev__")[1].split("_EnvSimilarity")[0]; 
        this.Env = envValue;
     }
     }
+    
+      get showVectorBetween() {
+        return this.selVectorScore == 'Between';
+    }
 
+    get showVecotorRange() {
+        return this.selVectorScore && this.selVectorScore != 'Between';
+    }
 
     get showSimilarCompany() {
         return this.data.length > 0 && this.graph_url != '';
@@ -58,6 +103,19 @@ export default class ZeniaComapnyRecords extends LightningElement {
         return this.Env == 'graph' ? true : false;
     }
 
+      get selSICCount() {
+        return this.selSIC && this.selSIC.length > 0 ? ('(' + this.selSIC.length + ' selected)') : '';
+    }
+
+    get selIndustryCount(){
+        return this.selIndustry && this.selIndustry.length > 0 ? ('(' + this.selIndustry.length + ' selected)') : '';
+
+    }
+     get selNAICSCount(){
+        return this.selNAICS && this.selNAICS.length > 0 ? ('(' + this.selNAICS.length + ' selected)') : '';
+
+    }
+
     connectedCallback() {
         setTimeout(() => {
             this.init();
@@ -65,9 +123,6 @@ export default class ZeniaComapnyRecords extends LightningElement {
     }
 
     init() {
-        //  console.log('this.leadIds = ', JSON.stringify(this.leadIds));
-        //  console.log('this.recordId = ', this.recordId);
-
         this.leadIdList = [];
         if (this.leadIds && this.leadIds.length > 0) {
             this.leadIdList = this.leadIds.split(',');
@@ -84,79 +139,88 @@ export default class ZeniaComapnyRecords extends LightningElement {
     initHandler() {
         this.showResponseTable = false;
         this.showTable = false;
-      // console.log('environment',this.Env);
-       //  this.isLoading = true;
-        //  console.log('this.leadIdList = ', JSON.stringify(this.leadIdList));
-        // call similarCompanyList
+
         similarCompanyList({ leadIds: this.leadIdList , Env : this.Env }).then(response => {
             try{
-             //   console.log('response = ', JSON.stringify(response));
+                         
                 this.leads = response.Leads;
                 this.leadsData = response.FilteredLeads;
                 this.data = [];
             
                 if(response && response.SimilarCompanyResponse) {
+
+                          this.sicOptions.push({ label: '--None--', value: '' });
+                          this.naicOptions.push({ label: '--None--', value: '' });
+                          this.industryOptions.push({ label: '--None--', value: '' });
+                          this.vectorScoreOptions.push({ label: '--None--', value: '' });
+                       
                     let similarCompanyResponse = JSON.parse(response.SimilarCompanyResponse);
-                    //   console.log('similarCompanyResponse is',JSON.stringify(similarCompanyResponse));
-                    
                     let leadNames = [];
                     this.leads.forEach(function (lead) {
                         leadNames.push(lead.Company);
                     });
-                   // console.log('leadNames = ', JSON.stringify(leadNames));
-                    
+  
                     if(similarCompanyResponse.data) {
+                         let sicRecs = [], naicRecs = [], industryRecs = [], vectorRecs = [] ; 
                         this.data = similarCompanyResponse.data.getSimilarCompaniesByName[0].records;
                         this.graph_url = similarCompanyResponse.data.getSimilarCompaniesByName[0].graph_url;
-                        
+                       
                         this.data.forEach(function (srcvalue) {
-                            if(srcvalue.source){
-                         const str = srcvalue.source.toLowerCase();
-                           // console.log('str',str);
-                            if (str == 'linkedin') {
-                                srcvalue.source = 'LinkedIn';
-                            } else if (str == 'dbpedia') {
-                                srcvalue.source = 'DBPedia';
-                            } else if (str == 'salesforce') {
-                                srcvalue.source = 'Salesforce'
-                            }                       
-                            }
-                        //    srcvalue.showAdd = false;
                             srcvalue.showUpdate = false;
-                          //  srcvalue.showRecord = true;
                             srcvalue.id = '';
                             leadNames.forEach(function (leadName) {
                                 if(leadName != srcvalue.name){
                                     srcvalue.showAdd = true;
                                 } 
                             });
-
                              leadNames.forEach(function (leadName) {
                                  if(leadName == srcvalue.name) {
                                   srcvalue.showAdd = false;
                                 }
                             });
-                       
                             srcvalue.hasContacts = true;
-                            /* let persons = [];
-                            if(srcvalue.persons) {
-                                persons = JSON.parse(srcvalue.persons);
 
-                                persons.forEach((item, index1) => {
-                                //  console.log('item = ', item);
-                                    item.index = (index1 + 1);
-                                    item.firstname = item['first name'];
-                                    item.lastname = item['last name'];
-                                });
-                            }
-                            srcvalue.persons = persons;
-                            srcvalue.hasContacts = (persons.length > 0 ? true : false);
-                            srcvalue.selectedRowClass = '';*/
                         }); 
-                     //  console.log('this.data = ', JSON.stringify(this.data));
-                
+                        this.data.forEach((item, index) => {
+
+                        let sicCodes = (item.SIC && item.SIC != '' ? item.SIC.split(',') : []);
+                        sicCodes.forEach((item1) => {
+                        if(item1 && item1 != '' && !sicRecs.includes(item1)) {
+                            this.sicOptions.push({ label: item1, value: item1 });
+                            sicRecs.push(item1);
+                         }
+                           });
+
+                       let naicCodes = (item.NAICS && item.NAICS != '' ? item.NAICS.split(',') : []);
+                          naicCodes.forEach((item1) => {
+                         if(item1 && item1 != '' && !naicRecs.includes(item1)) {
+                           this.naicOptions.push({ label: item1, value: item1 });
+                           naicRecs.push(item1);
+                        }    
+                   });
+
+                   let industries = (item.industry && item.industry != '' ? item.industry.split(',') : []);
+                    industries.forEach((item1) => {
+                       if(item1 && item1 != '' && !industryRecs.includes(item1)) {
+                          this.industryOptions.push({ label: item1, value: item1 });
+                            industryRecs.push(item1);
+                       }
+                  });
+                  if(item.vector_score && item.vector_score != '' && !vectorRecs.includes(item.vector_score)) {
+                         this.vectorScoreOptions.push({ label: item.vector_score , value: item.vector_score  });
+                          vectorRecs.push(item.vector_score);
+                     }
+                     });
                     } 
                 } 
+                 this.searchable = [];
+
+                this.data.forEach((item, index) => {
+                  //  if (index < this.pageSize)
+                        this.searchable.push(item);
+                });
+
+
                 if(this.data.length > 0) {
                      this.showResponseTable = true;
                      
@@ -173,22 +237,141 @@ export default class ZeniaComapnyRecords extends LightningElement {
                     this.showEmptyErr = false;
                     
                 }
-                //  console.log('this.leads = ', JSON.stringify(this.leads));
-                //  console.log('this.data = ', JSON.stringify(this.data));
 
             }catch(err) {
                 this.showEmptyErr = true;
-                console.log('err = ' + err);
+                this.showResponseTable = false;
+               // console.log('err = ' + err);
             }
             this.isLoading = false;
         }).catch(error => {
-            console.log('Error', JSON.stringify(error));
+          //  console.log('Error', JSON.stringify(error));
         });
     }
+  
+    handleFilterChange(event) {
+        let name = event.target.name;
+        let value = event.target.value;
 
+        if(name == 'SIC') {
+          if(!this.selSIC.includes(value)){
+                this.selSIC.push(value);
+            }
+            event.target.value = '';
+        } else if(name == 'NAICS') {
+             if(!this.selNAICS.includes(value)){
+                this.selNAICS.push(value);
+            }
+             event.target.value = '';
+        } else if(name == 'Industry') {
+             if(!this.selIndustry.includes(value)){
+                this.selIndustry.push(value);
+            }
+             event.target.value = '';
+        } else if(name == 'VectorScore') {
+             this.selVectorScore = value;
+            if (!this.selVectorScore) {
+                this.vectorBwFrom = null;
+                this.vectorBwTo = null;
+                this.vectorFrom = null;
+            } else if (this.selVectorScore == 'Between') {
+                this.vectorFrom = null;
+            } else {
+                this.vectorBwFrom = null;
+                this.vectorBwTo = null;
+            }
+        }
+        
+        this.filterData();
+    }
+
+     handleRemove(event){
+        let id = event.target.dataset.id;
+        let name = event.target.name;
+
+        if (id == 'SIC') {
+            this.selSIC.splice(this.selSIC.indexOf(name), 1);
+            this.refs.sicCmp.value = '';
+        }else if(id == 'NAICS'){
+            this.selNAICS.splice(this.selNAICS.indexOf(name),1);
+            this.refs.naicCmp.value = '';
+        }else if(id == 'Industry'){
+            this.selIndustry.splice(this.selIndustry.indexOf(name),1);
+            this.refs.indCmp.value = '';
+        }
+
+        this.filterData();
+    }
+
+ 
+
+   filterData() {
+  
+    
+        try{
+            let searchable = [];
+
+            this.data.forEach((item, index) => {
+                let isValid = true;
+                if (this.selSIC && this.selSIC.length > 0 && (!item.SIC || !this.validateMultiSelect(item.SIC, this.selSIC)))
+                    isValid = false;
+                if (this.selNAICS && this.selNAICS.length > 0 && (!item.NAICS || !this.validateMultiSelect(item.NAICS, this.selNAICS))) 
+                    isValid = false;
+                if (this.selIndustry && this.selIndustry.length > 0 && (!item.industry || !this.validateMultiSelect(item.industry, this.selIndustry))) 
+                    isValid = false;
+
+                  isValid = this.validateOperatorFilters(isValid, this.selVectorScore, this.vectorBwFrom, this.vectorBwTo, this.vectorFrom, item.vector_score, 'FLOAT');    
+                
+               // if(isValid && searchable.length < this.pageSize)
+                if (isValid)
+                    searchable.push(item);
+            });
+            
+            this.searchable = searchable;
+             this.pageNo = 1;
+         
+        }catch(err) {
+           // console.log('err = ' + err);
+        }
+    }
+
+    validateOperatorFilters(isValid, operator, betweenFromValue, betweenToValue, fromValue, actualValue, type) {
+
+        if(type == 'INTEGER') {
+            if (operator == 'Between' && betweenFromValue && betweenToValue
+                && (!actualValue || !(parseInt(betweenFromValue) <= parseInt(actualValue) && parseInt(betweenToValue) >= parseInt(actualValue))))
+                isValid = false;
+
+            if (operator && operator != 'Between' && fromValue) {
+                if (!actualValue
+                    || (operator == 'Greater Than' && !(parseInt(fromValue) < parseInt(actualValue)))
+                    || (operator == 'Less Than' && !(parseInt(fromValue) > parseInt(actualValue)))
+                    || (operator == 'Equal to' && !(parseInt(fromValue) == parseInt(actualValue)))
+                    || (operator == 'Greater Than Equal To' && !(parseInt(fromValue) <= parseInt(actualValue)))
+                    || (operator == 'Less Than Equal To' && !(parseInt(fromValue) >= parseInt(actualValue)))
+                )
+                    isValid = false;
+            }
+        } else if(type == 'FLOAT') {
+            if (operator == 'Between' && betweenFromValue && betweenToValue
+                && (!actualValue || !(parseFloat(betweenFromValue) <= parseFloat(actualValue) && parseFloat(betweenToValue) >= parseFloat(actualValue))))
+                isValid = false;
+
+            if (operator && operator != 'Between' && fromValue) {
+                if (!actualValue
+                    || (operator == 'Greater Than' && !(parseFloat(fromValue) < parseFloat(actualValue)))
+                    || (operator == 'Less Than' && !(parseFloat(fromValue) > parseFloat(actualValue)))
+                    || (operator == 'Equal to' && !(parseFloat(fromValue) == parseFloat(actualValue)))
+                    || (operator == 'Greater Than Equal To' && !(parseFloat(fromValue) <= parseFloat(actualValue)))
+                    || (operator == 'Less Than Equal To' && !(parseFloat(fromValue) >= parseFloat(actualValue)))
+                )
+                    isValid = false;
+            }
+        }
+        return isValid;
+    }
     handleRowSelection(event) {
         let selectedRows = event.detail.selectedRows;
-        //  console.log('selectedRows = ', JSON.stringify(selectedRows));
 
         let leadIdList = [];
         if(selectedRows.length > 0) {
@@ -214,18 +397,16 @@ export default class ZeniaComapnyRecords extends LightningElement {
 
     handleShowSimilarCompany() {
         window.open(this.graph_url, '_blank');
-        // this.handleGoBack();
+      
     }
 
     addCompanyRecord(event) {
-        //  console.log('event.target.dataset.id = ', event.target.dataset.id);
-
+   try{
         let leadList = [];
         //let contactList = [];
 
         let selectedIndex = event.target.dataset.id;
         let selectedData = this.data[event.target.dataset.id];
-        console.log('selectedData = ', JSON.stringify(selectedData));
         
         if(selectedData) {
             leadList.push({
@@ -233,34 +414,17 @@ export default class ZeniaComapnyRecords extends LightningElement {
                 "LastName": selectedData.name,
                 "zeniadev__Vector_Score__c": selectedData.vector_score, 
                 "Company": selectedData.name, 
-                "zeniadev__Datasource__c": selectedData.source, 
-              //  "zeniadev__Datasource__c": '', 
-                "zeniadev__SICCode__c": selectedData.SIC.toString(), 
-                "zeniadev__Niacs_Code__c": selectedData.NAICS.toString(), 
+                "zeniadev__Datasource__c": selectedData.source,                
+                "zeniadev__SICCode__c": selectedData.SIC != null ? selectedData.SIC.toString() : '', 
+                "zeniadev__Niacs_Code__c": selectedData.NAICS != null ? selectedData.NAICS.toString() : '' ,
                 "Industry": selectedData.industry
             });
-
-            /*if(selectedData.persons && selectedData.persons.length > 0) {
-                selectedData.persons.forEach((item, index1) => {
-                    contactList.push({
-                        "FirstName": item.firstname,
-                        "LastName": item.lastname, 
-                        "Email": item.email,
-                        "Phone": item.phone,
-                        "zeniadev__Is_Primary__c": item.primary,
-                        "zeniadev__Designation__c": item.designation
-                    });
-                });
-            }*/
-            
-            // console.log('leadList = ', JSON.stringify(leadList));
-            // console.log('contactList = ', JSON.stringify(contactList));
 
             if(leadList.length > 0) {
                 // call saveLeads
                 saveLeads({ leads: leadList })
                     .then(result => {
-                        console.log('result = ' + JSON.stringify(result));
+                   //     console.log('result = ' + JSON.stringify(result));
 
                         const evt = new ShowToastEvent({
                             title: 'Success',
@@ -296,65 +460,61 @@ export default class ZeniaComapnyRecords extends LightningElement {
                         });
                     
                     }).catch(error => {
-                        console.log('error#' + JSON.stringify(error));
+                       // console.log('error#' + JSON.stringify(error));
                     });
             }
+        }
+   } catch (err) {
+           // console.log('err = ' + err);
         }
     }
     
     displayContactDetails(event){
-        //  let contacts = this.data[event.target.dataset.id].contacts;
-       // this.isLoading = true;
+     
         let compname = this.data[event.target.dataset.id];
         displayContacts({ Company: compname.name }).then(response => {
-            console.log(JSON.stringify(response));
-            let contacts = response;
-            console.log(contacts);
+          let contacts = response;
           this.isLoading = false;
             const result = showContacts.open({
-                size: 'small', //small, medium, or large default :medium
-                // description: 'Accessible description of modal\'s purpose',
+                size: 'small', 
                 content: contacts,
             });
         }).catch(error => {
-             console.log('error#' + JSON.stringify(error));
+           //  console.log('error#' + JSON.stringify(error));
         });
         
     }
 
-    //FOR HANDLING THE HORIZONTAL SCROLL OF TABLE MANUALLY
-    tableOuterDivScrolled(event) {
-        this._tableViewInnerDiv = this.template.querySelector(".tableViewInnerDiv");
-        if (this._tableViewInnerDiv) {
-            if (!this._tableViewInnerDivOffsetWidth || this._tableViewInnerDivOffsetWidth === 0) {
-                this._tableViewInnerDivOffsetWidth = this._tableViewInnerDiv.offsetWidth;
+    
+    validateMultiSelect(value, selValues) {
+        let isValid = false;
+
+        selValues.forEach((item) => {
+            if(value.includes(item)) {
+                isValid = true;
             }
-            this._tableViewInnerDiv.style = 'width:' + (event.currentTarget.scrollLeft + this._tableViewInnerDivOffsetWidth) + "px;" + this.tableBodyStyle;
+        });
+        return isValid;
+    }
+     handlePrevNext(event) {       
+        this.pageNo = event.target.name == 'prev' ? this.pageNo - 1 : this.pageNo + 1;
+    }
+
+    handleOperatorvalues(event) {
+        let id = event.target.dataset.id;
+        let name = event.target.name;
+        let value = event.target.value;
+
+        if (id == 'vectorScore') {
+            if (name == 'vectorBwFrom') {
+                this.vectorBwFrom = value;
+            } else if (name == 'vectorBwTo') {
+                this.vectorBwTo = value;
+            } else if (name == 'vectorFrom') {
+                this.vectorFrom = value;
+            }
         }
-        this.tableScrolled(event);
+        this.filterData();
     }
-
-    tableScrolled(event) {
-        
-    }
- 
-    //#region ***************** RESIZABLE COLUMNS *************************************/
-    handlemouseup(e) {
-       
-    }
- 
-    handlemousedown(e) {
-       
-    }
- 
-    handlemousemove(e) {
-      
-    }
- 
-    handledblclickresizable() {
-        
-     
-    }
-
 
 }

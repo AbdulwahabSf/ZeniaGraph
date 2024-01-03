@@ -20,3 +20,12 @@
     overflow-y: hidden;
     height: 20rem;
 }
+.blue-rocket{
+    --sds-c-icon-color-foreground-default: blue;
+    --sds-c-icon-color-background: pink;
+}
+
+.slds-input-has-icon .slds-input__icon:not(button) {
+pointer-events: all;
+cursor: pointer;
+}

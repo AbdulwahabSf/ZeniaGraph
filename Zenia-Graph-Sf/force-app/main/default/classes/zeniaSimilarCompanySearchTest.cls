@@ -1,19 +1,10 @@
 @isTest
 public class zeniaSimilarCompanySearchTest implements HttpCalloutMock{
     
-     @testSetup static void setup() {
-        Zenia_API_Service__c zasObj = new Zenia_API_Service__c();
-        zasObj.Endpoint__c = 'test';
-        zasObj.Header__c = 'application/json';
-        zasObj.Method__c = 'POST';
-        insert zasObj;
-     }
-    
     static testMethod void testsimilarCompanySearch(){
         
         string searchQuery = 'find the names and abstract of companies in the Financial Services industry with more than 200,00 employees';
-        // string searchResults = similarCompanySearch.similarCompanySearch(searchQuery);
-        
+
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new zeniaSimilarCompanySearchTest());  
         string searchResults = zeniaSimilarCompanySearch.similarCompanySearch(searchQuery);

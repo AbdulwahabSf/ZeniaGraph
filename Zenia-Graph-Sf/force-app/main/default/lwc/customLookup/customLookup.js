@@ -15,13 +15,12 @@ export default class CustomLookup extends LightningElement {
 
     inputClass;
     @track boxClass = 'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-has-focus';
-    
+
     @track records;
 
 
     handleClick(event) {
-        console.log('inside handleClick');
-        if(!this.searchTerm)
+        if (!this.searchTerm)
             this.searchTerm = '';
         this.inputClass = 'slds-has-focus';
         this.boxClass = 'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-has-focus slds-is-open';
@@ -35,7 +34,7 @@ export default class CustomLookup extends LightningElement {
 
         // fire event
         this.dispatchEvent(new CustomEvent('lookupitemselected', { detail: this.selectedItemId }));
-        
+
         this.boxClass = 'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-has-focus';
     }
 
@@ -43,38 +42,39 @@ export default class CustomLookup extends LightningElement {
         let name = event.target.name;
         let value = event.target.value;
 
-        console.log('name = ' + name);
-        console.log('value = ' + value);
+        // console.log('name = ' + name);
+        // console.log('value = ' + value);
 
-        if(name = 'searchInput') {
-            if(this.searchTerm != value)
+        if (name = 'searchInput') {
+            if (this.searchTerm != value)
                 this.isLoading = true;
             this.searchTerm = value;
-           if(value){
-            this.callFrameRequest();
-        }
+           
+            if (value) {
+                this.callFrameRequest();
+            }
         }
     }
 
-   @track result;
-   @track fres;
+    @track result;
+    @track fres;
     callFrameRequest() {
-        console.log('inside callFrameRequest');
-        
+        //console.log('inside callFrameRequest');
+
         // call frameRequest
         frameRequest({ value: this.searchTerm, code: (this._searchPlaceholder == 'Search for NAICS' ? 'NAICS' : 'SIC') })
             .then(result => {
 
-              this.result = JSON.parse(result);
-                console.log('json parse result',this.result);
-               
-                    this.records = JSON.parse(result);
-          
+                this.result = JSON.parse(result);
+                console.log('json parse result', this.result);
+
+                this.records = JSON.parse(result);
+
                 this.isLoading = false;
-             
+
             })
             .catch(error => {
-                console.log('error in frameRequest = ' + JSON.stringify(error));
+               console.log('error in frameRequest = ' + JSON.stringify(error));
                 this.result = undefined;
                 this.isLoading = false;
             });
@@ -97,7 +97,7 @@ export default class CustomLookup extends LightningElement {
     }
 
     set showLabel(value) {
-       this._showLabel = value;
+        this._showLabel = value;
     }
 
     @api
@@ -106,7 +106,7 @@ export default class CustomLookup extends LightningElement {
     }
 
     set label(value) {
-       this._label = value;
+        this._label = value;
     }
 
     @api
@@ -115,6 +115,6 @@ export default class CustomLookup extends LightningElement {
     }
 
     set searchPlaceholder(value) {
-       this._searchPlaceholder = value;
+        this._searchPlaceholder = value;
     }
 }

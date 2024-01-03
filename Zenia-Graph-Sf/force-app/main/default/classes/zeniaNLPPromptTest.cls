@@ -1,14 +1,6 @@
 @isTest
 public class zeniaNLPPromptTest implements HttpCalloutMock{
 
-     @testSetup static void setup() {
-        Zenia_API_Service__c zasObj = new Zenia_API_Service__c();
-        zasObj.Endpoint__c = 'test';
-        zasObj.Header__c = 'application/json';
-        zasObj.Method__c = 'POST';
-        insert zasObj;
-     }
-    
     static testMethod void testsimilarCompanySearch(){
         
         string searchQuery = 'get me industry and revenue of Amazon';

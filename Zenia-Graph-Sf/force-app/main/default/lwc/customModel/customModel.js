@@ -15,10 +15,6 @@ export default class LWCModal extends LightningModal {
     }
     connectedCallback() {
         this.contactDetails = this.content;
-    //      this.contactDetails.map((FirstName, index) => {
-    //       return {FirstName, sno: index + 1};
-    //   });
-        //   console.log('content contact data ',this.contactDetails);
     }
 
 }

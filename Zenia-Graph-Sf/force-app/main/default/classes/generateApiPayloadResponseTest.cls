@@ -2,11 +2,6 @@
 public class generateApiPayloadResponseTest implements HttpCalloutMock {
 
     @testSetup static void setup() {
-        Zenia_API_Service__c zasObj = new Zenia_API_Service__c();
-        zasObj.Endpoint__c = 'test';
-        zasObj.Header__c = 'application/json';
-        zasObj.Method__c = 'POST';
-        insert zasObj;
         
         Lead leadObj = new Lead();
         leadObj.Company= 'Apple';
@@ -21,10 +16,11 @@ public class generateApiPayloadResponseTest implements HttpCalloutMock {
     
     static testMethod void testGetGraphPayload(){
         list<Id> nleadIds = new list<Id>();
-        List<lead> leadIds = [select id from lead limit 1 ];
-        
+        List<lead> leadIds = [select id, company from lead limit 1 ];
+        list<string> companyList = new list<string>();
         for(lead ld : leadIds){
             nleadIds.add(ld.id);
+            companyList.add(ld.company);
         }
         
         String queryData = 'ACTIVE\n+40 years operating business\n+50 employees\n+10 mil in investment funding\n+2% growth quarterly\n+3% growth yearly\nINACTIVE\n-160 year operating business\n-60000 employees\n-5 mil in investment funding\n-5% growth quarterly\n-1% growth yearly\nOthers\nAny other leads which are not Active or Inactive';
@@ -33,14 +29,14 @@ public class generateApiPayloadResponseTest implements HttpCalloutMock {
         
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new generateApiPayloadResponseTest());  
-        List<generateApiPayloadResponse.LeadWrapper> lwList = generateApiPayloadResponse.getGraphPayload(nleadIds, queryData, datasource, '872632', '7653');
+        List<generateApiPayloadResponse.LeadWrapper> lwList = generateApiPayloadResponse.getGraphPayload(nleadIds, queryData, datasource, '872632', '7653','testEvent');
+        string getshowkgresponse = generateApiPayloadResponse.getshowkgresponse(companyList);
         Test.stopTest();
     }
     
     static testMethod void testSaveLeads() {
         List<lead> leads = [select id from Lead];
-        
-        generateApiPayloadResponse.saveLeads(leads);
+         generateApiPayloadResponse.saveLeads(leads);
     }
     
     public HTTPResponse respond(HTTPRequest request) {

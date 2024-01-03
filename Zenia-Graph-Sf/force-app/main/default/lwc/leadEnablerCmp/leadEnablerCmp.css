@@ -67,3 +67,9 @@
 .font-size{
     font-size: 18px;
 }
+.filter-position{
+    padding-left:400px;
+}
+.THIS .slds-form-element__label{
+font-size: 1.25rem !important;
+}

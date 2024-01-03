@@ -1,10 +1,6 @@
 <!-- sldsValidatorIgnore -->
 <template>
 	<lightning-quick-action-panel >
-	<template if:true={isLoading}>
-		<lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>
-	</template>
-   
      <template if:true={showEmptyErr}>
 		 	<div class=" slds-text-color_error slds-page-header__title slds-align_absolute-center">
 			No Records Found</div>
@@ -21,120 +17,114 @@
 	</template>
 
 	<template if:true={showResponseTable}>
-		<div id="containerDiv" onmousemove={handlemousemove} onmouseup={handlemouseup}
-         ondblclick={handledblclickresizable}
-         class="slds-table_header-fixed_container slds-border_right slds-border_left tableScroll"
-         onscroll={tableOuterDivScrolled}>
-		<div id="tableViewInnerDiv" onscroll={tableScrolled} class="slds-scrollable_y tableViewInnerDiv">
- 
-		<table class="slds-table slds-table_bordered slds-table_header-fixed slds-table_resizable-cols slds-table_fixed-layout" >
-			<thead>
-				<tr>
-					<th class="slds-is-resizable dv-dynamic-width" style="width:6rem;" >
-						<div class="slds-cell-fixed" >
-							<a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="Source">Action</div>
-							</a>
-							<!-- <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div> -->
-                            </div> 
-					</th>
-					<th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						<div class="slds-cell-fixed" style={fixedWidth}>
-						  <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" style={fixedWidth} title="Company">Company</div>
-						  </a>
-						   <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div>
-                            </div>
-					</th>
-					<th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						 <div class="slds-cell-fixed" style={fixedWidth}>
-							  <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="Industry">Industry</div>
-							  </a>
-							  <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div>
-                            </div>
-							  
-					</th>
-					<th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						<div class="slds-cell-fixed" style={fixedWidth}>
-							  <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="SIC">SIC Code</div>
-							  </a>
-							  <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div>
-                            </div>
-					</th>
-					<th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						<div class="slds-cell-fixed" style={fixedWidth}>
-							 <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="NAICS">NAICS Code</div>
-							 </a>
-							  <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div>
-                            </div>
-					</th>
-						<!-- <template if:true={displaySource}>
-					 <th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						 <div class="slds-cell-fixed" style={fixedWidth}>
-							 	 <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="Source">Source</div>
-							 	   </a>
-								   <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                    </div>
-                            </div>
-					</th> 
-						</template> -->
-					<th class="slds-is-resizable dv-dynamic-width" scope="col" style={fixedWidth}>
-						 <div class="slds-cell-fixed" style={fixedWidth}>
-							 	 <a class="slds-th__action slds-text-link--reset ">
-						<div class="slds-truncate" title="Source">Vector Score</div>
-							 	 </a>
-								  <div class="slds-resizable">
-                                    <span class="slds-resizable__handle" onmousedown={handlemousedown}>
-                                        <span class="slds-resizable__divider"></span>
-                                    </span>
-                                </div>
-                            </div>
-					</th>
-					
-				</tr>
-			</thead>
-			<tbody>
-				<template for:each={data} for:item="ld" for:index="index">
-
-					<!-- <template if:true={ld.showRecord}> -->
+        <lightning-layout multiple-rows>
+            <lightning-layout-item size="2" padding="around-small">
+					<b><h1>Industry {selIndustryCount}</h1></b>
+                <div class="custom-box">
+					<lightning-select  name="Industry"  placeholder="Filter Industry" lwc:ref="indCmp"
+									 			options={industryOptions} onchange={handleFilterChange}>
+					</lightning-select>
+					</div>
+					<div class="slds-p-around_xx-small">
+           <template for:each={selIndustry} for:item="val">
+            <lightning-pill key={val} label={val} name={val} data-id="Industry" onremove={handleRemove}></lightning-pill>
+             </template>
+          </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="2" padding="around-small">
+				<b><h1>SIC {selSICCount}</h1></b>
+                <div class="custom-box"><lightning-select  name="SIC"  placeholder="Filter SIC" lwc:ref="sicCmp"
+									 			options={sicOptions} onchange={handleFilterChange}>
+							</lightning-select>
+							</div>
+				<div class="slds-p-around_xx-small">
+					<template for:each={selSIC} for:item="val">
+						<lightning-pill key={val} label={val} name={val} data-id="SIC" onremove={handleRemove}></lightning-pill>
+					</template>
+				</div>
+            </lightning-layout-item>
+            <lightning-layout-item size="2" padding="around-small">
+				<b><h1>NAICS {selNAICSCount}</h1></b>
+                <div class="custom-box ">
+					<lightning-select name="NAICS"  placeholder="Filter NAICS" lwc:ref="naicCmp"
+									 			options={naicOptions} onchange={handleFilterChange}>
+					</lightning-select>
+					</div>
+					<div class="slds-p-around_xx-small">
+					<template for:each={selNAICS} for:item="val">
+						<lightning-pill key={val} label={val} name={val} data-id="NAICS" onremove={handleRemove}></lightning-pill>
+					</template>
+				</div>
+            </lightning-layout-item>
+				
+            <lightning-layout-item size="2"  padding="around-small">
+				<b><h1>Vector Score</h1></b>
+                <div >
+					<lightning-select  name="VectorScore"  placeholder="Filter Vector"
+									 			options={operatorOptions} onchange={handleFilterChange}>
+					</lightning-select>
+							<template if:true={showVectorBetween}>
+						<div class="slds-grid slds-grid_align-center">
+							<div class="slds-col  ">
+								<span><lightning-input  placeholder="from" data-id="vectorScore" name = "vectorBwFrom"  
+																onchange = {handleOperatorvalues} step="0.0001" type="number"></lightning-input></span>
+							</div>
+							<div class="slds-col slds-grow-none">
+								<span></span>
+							</div>
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="to" data-id="vectorScore" name = "vectorBwTo"
+															  onchange = {handleOperatorvalues} step="0.0001" type="number"></lightning-input></span>
+							</div>
+						</div>
+					</template>
+					<template if:true={showVecotorRange}>
+						<lightning-input placeholder="From VS" step="0.0001" data-id="vectorScore"
+							name="vectorFrom" onchange={handleOperatorvalues} type="number"></lightning-input>
+					</template>
+							</div>
+            </lightning-layout-item>
+        </lightning-layout>
+      	   
+        <div class="slds-scrollable slds-m-around_medium" >
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered slds-table_striped slds-max-medium-table_stacked-horizontal">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<th class="" scope="col">
+							<div class="slds-truncate">
+								Action
+							</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Company">Company</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Company">Industry</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Company">SIC Code</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Company">NAICS Code</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Vector Score">Vector Score</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={tableData} for:item="ld" for:index="index">
 						<tr key={ld.id} class={ld.selectedRowClass}>
-							<td >
+							<td>
 								<template if:true={ld.showAdd}>
-									<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>
+									<div class="slds-truncate dv-dynamic-width" >
 									<lightning-button name="Action" label="Add" data-id={index}
 										onclick={addCompanyRecord}>
 									</lightning-button>
 									</div>
 								</template>
 								<template if:true={ld.showUpdate}>
-									<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>
+									<div class="slds-truncate dv-dynamic-width" >
 									<lightning-button name="Action" label="Update" data-id={index}
 										onclick={addCompanyRecord}>
 									</lightning-button>
@@ -142,41 +132,51 @@
 								</template>
 							</td>
 							<td scope="col">
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>
-									<template if:true={ld.hasContacts}>
+								<div><template if:true={ld.hasContacts}>
 										<lightning-icon data-id={index} icon-name='utility:info_alt' size='x-small'
 										title='Contact Details' onclick={displayContactDetails}>
-									</lightning-icon></template> {ld.name}
-								</div>
+									</lightning-icon></template>{ld.name}</div>
 							</td>
-							<td  >
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>{ld.industry}</div>
+							<td scope="col" style="width:1rem;">
+								<div>{ld.industry}</div>
 							</td>
-							<td >
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>{ld.SIC}</div>
+							<td scope="col">
+								<div>{ld.SIC}</div>
 							</td>
-							<td >
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>{ld.NAICS}</div>
+							<td scope="col">
+								<div>{ld.NAICS}</div>
 							</td>
-							<!-- <template if:true={displaySource}>
-						    <td >
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>{ld.source}</div>
-							</td> 
-							</template> -->
-							<td >
-								<div class="slds-truncate dv-dynamic-width" style={fixedWidth}>{ld.vector_score}</div>
+							<td scope="col">
+								<div>{ld.vector_score}</div>
 							</td>
-							
 						</tr>
-					<!-- </template> -->
-				</template>
-			</tbody>
-		</table>
+					</template>
+				</tbody>
+			</table>
 		</div>
-		</div>
+		
 
 		<footer class="slds-modal__footer">
+			<div class="slds-align_absolute-center">
+				<div class="slds-p-right_xx-small">
+
+					<lightning-button label="" icon-name="utility:chevronleft" name="prev" variant="base"
+						onclick={handlePrevNext} disabled={disablePrev}>
+					</lightning-button>
+				</div>
+				<span class="slds-badge slds-badge_lightest">
+
+					<b>Page {pageNo} of {lastPage}</b>
+                </span>
+				<div class="slds-p-left_xx-small">
+
+					<lightning-button label="" icon-name="utility:chevronright" name="next" variant="base"
+						onclick={handlePrevNext} disabled={disableNext}>
+					</lightning-button>
+				</div>
+			</div>
 			<div class="slds-grid slds-gutters slds-align_absolute-center">
+				
 				<lightning-layout>
 					<lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
 						<lightning-button label="Go Back" variant="brand-outline" onclick={handleGoBack}>
@@ -212,13 +212,12 @@
 						<lightning-button label="Go Back" variant="brand-outline" onclick={handleGoBack}>
 						</lightning-button>
 					</lightning-layout-item>
-					<!--<lightning-layout-item class="slds-m-top_small slds-m-left_x-small">
-						<lightning-button label="Show Similar Company" variant="brand" onclick={handleShowSimilarCompany}
-							disabled={showButton}></lightning-button>
-					</lightning-layout-item>-->
 				</lightning-layout>
 			</div>
 		</footer>
+	</template>
+	<template if:true={isLoading}>
+		<lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>
 	</template>
 	</lightning-quick-action-panel>
 </template>

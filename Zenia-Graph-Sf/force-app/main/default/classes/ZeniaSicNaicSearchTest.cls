@@ -1,14 +1,6 @@
 @isTest
 global class ZeniaSicNaicSearchTest implements HttpCalloutMock{
     
-    @testSetup static void setup() {
-        Zenia_API_Service__c zasObj = new Zenia_API_Service__c();
-        zasObj.CodeEndpoint__c = 'test';
-        zasObj.Header__c = 'application/json';
-        zasObj.Method__c = 'POST';
-        insert zasObj;
-    }
-    
     static testMethod void testframeRequest(){
         
         Test.startTest();

@@ -147,10 +147,6 @@
 			<div class="slds-col slds-size_1-of-3">
 				<span>
 					<div class="headingclr "> Settings</div>
-					<!-- <div class="slds-text-heading_small">Data Sources Selection</div>
-					<lightning-input type="checkbox" data-id="linkedin" label="LinkedIn" onchange={handleChange} checked={isLinkedIn}></lightning-input>
-					<lightning-input type="checkbox" data-id="dbpedia" label="DBPedia" onchange={handleChange} checked={isDBPedia}></lightning-input>
-					<lightning-input type="checkbox" data-id="zoominfo" label="ZoomInfo" onchange={handleChange} checked={isZoomInfo}></lightning-input> -->
 					<div class="slds-text-heading_small slds-m-bottom_xx-small slds-m-top_xx-small">Industry Classification Search Filter</div>
 					<lightning-radio-group class= "slds-m-bottom_x-small" name="radioGroup" label="" options={classifyoptions} value={classifyValue} type="radio" onchange={handleRadioChange}></lightning-radio-group>
 					<div class="slds-combobox_container" if:true={displayNIAC}>
@@ -158,6 +154,16 @@
 					</div>
 					<div class="slds-combobox_container" if:true={displaySIC}>
 						<c-custom-lookup show-label="false" search-placeholder="Search for SIC" onlookupitemselected={handleLookupItemSelected} data-id="SIC"></c-custom-lookup>
+					</div>
+					<div class="slds-text-heading_small slds-m-bottom_xx-small ">Event</div>
+					<div class="slds-size_1-of-3 slds-m-bottom_xx-small" > 
+					<lightning-select
+                     name="Event"
+                     value={eventValue}
+                     placeholder="Select Event"
+                     options={eventOptions}
+                     onchange={handleEventChange} >
+					 </lightning-select>
 					</div>
 					<div class="slds-text-heading_small ">Available Criteria's: </div>
 					<div class="font-color">Years of operating business, employees, growth quarterly, growth yearly</div>
@@ -172,17 +178,170 @@
 		</div>
 	</div>
 
-
-
 	<div class={showData}>
-		<b>
-        	 <h3 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate slds-align_absolute-center">Lead Selection</h3>
-      	</b>
+
 		<div if:true={showSpinner} class="slds-is-relative">
 			<lightning-spinner alternative-text="Loading..." variant="brand"></lightning-spinner>
 		</div>
+		<b>
+        	 <h3 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate slds-align_absolute-center">Lead Selection</h3>
+      	</b>
+
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small slds-m-left_x-small">
+				<b><h1>Industry {selIndustryCount}</h1></b>
+		 <div class="">
+            <lightning-select name="Industry" placeholder="Filter Industry" lwc:ref="indCmp"
+              options={industryOptions} onchange={handleFilterChange} ></lightning-select>
+         </div>
+	 			 <div class="slds-p-around_xx-small">
+           <template for:each={selIndustry} for:item="val">
+            <lightning-pill key={val} label={val} name={val} data-id="Industry" onremove={handleRemove}></lightning-pill>
+             </template>
+          </div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small">
+				<b><h1>SIC {selSICCount}</h1></b>
+				<div class="">
+					<lightning-select name="SIC" placeholder="Filter SIC" options={sicOptions} lwc:ref="sicCmp"
+						onchange={handleFilterChange}>
+					</lightning-select>
+				</div>
+				<div class="slds-p-around_xx-small">
+					<template for:each={selSIC} for:item="val">
+						<lightning-pill key={val} label={val} name={val} data-id="SIC" onremove={handleRemove}></lightning-pill>
+					</template>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small">
+			<b><h1>NAICS {selNAICSCount}</h1></b>
+				<div class="">
+					<lightning-select name="NAICS" placeholder="Filter NAICS" options={naicOptions} lwc:ref="naicCmp"
+						onchange={handleFilterChange}>
+					</lightning-select>
+				</div>
+			
+				<div class="slds-p-around_xx-small">
+					<template for:each={selNAICS} for:item="val">
+						<lightning-pill key={val} label={val} name={val} data-id="NAICS" onremove={handleRemove}></lightning-pill>
+					</template>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small">
+				<b><h1>Headquarters {selHeadQrCount}</h1></b>
+				<div class="">
+					<lightning-select name="Headquarters" placeholder="Filter Headquarters" options={headquarterOptions} lwc:ref="headCmp"
+						onchange={handleFilterChange}>
+					</lightning-select>
+					</div>
+				<div class="slds-p-around_xx-small">
+					<template for:each={selHeadquarters} for:item="val">
+						<lightning-pill key={val} label={val} name={val} data-id="headquarter" onremove={handleRemove}></lightning-pill>
+					</template>
+				</div>
+			
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small ">
+				<b><h1>Status</h1></b>
+				<div class="">
+					<lightning-select name="Status" placeholder="Filter Status" options={statusOptions}
+						onchange={handleFilterChange}>
+					</lightning-select>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small slds-m-left_x-small">
+				<b><h1>Employees</h1></b>
+				<div class="">
+					<lightning-select name="NoOfEmployees" placeholder="Filter No. Of Employees"
+						options={operatorOptions} value="" onchange={handleFilterChange}>
+					</lightning-select>
+					<template if:true={showNoOfEmployeesBetween}>
+						<div class="slds-grid slds-grid_align-center">
+							<div class="slds-col  ">
+								<span><lightning-input  placeholder="from" data-id="NoOfEmployees" name = "empBetweenFrom"  
+																onchange = {handleOperatorvalues}  type="number"></lightning-input></span>
+							</div>
+							<div class="slds-col slds-grow-none">
+								<span></span>
+							</div>
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="to" data-id="NoOfEmployees" name = "empBetweenTo"
+															  onchange = {handleOperatorvalues}  type="number"></lightning-input></span>
+							</div>
+						</div>
+					</template>
+					<template if:true={showNoOfEmployeesNotBetween}>
+						<lightning-input placeholder="Enter Employees" step="0.01" data-id="NoOfEmployees"
+							name="empFrom" onchange={handleOperatorvalues} type="number"></lightning-input>
+					</template>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small">
+				<b><h1>Quarterly Growth</h1></b>
+				<div class="">
+					<lightning-select name="QuarterlyGrowth" placeholder="Filter Quarterly Growth"
+						options={operatorOptions} onchange={handleFilterChange}>
+					</lightning-select>
+					<template if:true={showQuarterlyGrowthBetween}>
+						<div class="slds-grid slds-grid_align-center">
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="from" data-id="QuarterlyGrowth" name = "qtrGrowthBetweenFrom" 
+																 onchange = {handleOperatorvalues} step="0.01" type="number"></lightning-input></span>
+							</div>
+							<div class="slds-col slds-grow-none">
+								<span></span>
+							</div>
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="to" data-id="QuarterlyGrowth"  name = "qtrGrowthBetweenTo" 
+																onchange = {handleOperatorvalues}  step="0.01" type="number"></lightning-input></span>
+							</div>
+						</div>
+					</template>
+					<template if:true={showQuarterlyGrowthNotBetween}>
+						<lightning-input placeholder="Enter Employees" data-id="QuarterlyGrowth" name="qtrGrowthFrom"
+							onchange={handleOperatorvalues} step="0.01" type="number"></lightning-input>
+					</template>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-right_small">
+				<b><h1>Annual Growth</h1></b>
+				<div class="">
+					<lightning-select name="AnnualGrowth" placeholder="Filter Annual Growth" options={operatorOptions}
+						onchange={handleFilterChange}>
+					</lightning-select>
+					<template if:true={showAnnualGrowthBetween}>
+						<div class="slds-grid slds-grid_align-center">
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="from" data-id="AnnualGrowth" name = "annGrowthBetweenFrom" 
+															onchange = {handleOperatorvalues} step="0.01" type="number"></lightning-input></span>
+							</div>
+							<div class="slds-col slds-grow-none">
+								<span></span>
+							</div>
+							<div class="slds-col ">
+								<span><lightning-input  placeholder="to" data-id="AnnualGrowth"  name = "annGrowthBetweenTo"
+															 onchange = {handleOperatorvalues} step="0.01" type="number"></lightning-input></span>
+							</div>
+						</div>
+					</template>
+					<template if:true={showAnnualGrowthNotBetween}>
+						<lightning-input placeholder="Enter Employees" data-id="AnnualGrowth" name="annGrowthFrom"
+							onchange={handleOperatorvalues} step="0.01" type="number"></lightning-input>
+					</template>
+
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="around-xx_small" class="slds-m-left_xx-large slds-m-top_large">
+				<lightning-button label="ShowKG" variant="brand" onclick={openShowKg}>
+				</lightning-button>
+			</lightning-layout-item>
+		</lightning-layout>
+
+		<br/>
+
 		<div class="">
-			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+			<table class="slds-table_cell-buffer slds-table_bordered slds-table_col-bordered slds-table"
+				aria-labelledby="element-with-table-label other-element-with-table-label">
 				<thead>
 					<tr class="slds-line-height_reset">
 						<th class="" scope="col">
@@ -191,7 +350,7 @@
 							</div>
 						</th>
 						<th class="" scope="col">
-							<div class="slds-truncate"  title="Company">Company</div>
+							<div class="slds-truncate" title="Company">Company</div>
 						</th>
 						<th class="" scope="col">
 							<div class="slds-truncate" title="Company">Industry</div>
@@ -202,9 +361,6 @@
 						<th class="" scope="col">
 							<div class="slds-truncate" title="Company">NAICS Code</div>
 						</th>
-						<!-- <th class="" scope="col">
-							<div class="slds-truncate" title="Email">Data Source Status</div>
-						</th> -->
 						<th class="" scope="col">
 							<div class="slds-truncate" title="Operating Years">Operating Years</div>
 						</th>
@@ -218,16 +374,19 @@
 							<div class="slds-truncate" title="Annual Growth">Annual Growth(bn)</div>
 						</th>
 						<th class="" scope="col">
+							<div class="slds-truncate" title="Headquarters">Headquarters</div>
+						</th>
+						<th class="" scope="col">
 							<div class="slds-truncate" title="Email">Status</div>
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					<template for:each={searchable} for:item="ld" for:index="index">
+					<template for:each={tableData} for:item="ld" for:index="index">
 						<tr key={ld.id}>
 							<td scope="col">
 								<div>
-									<lightning-input type="checkbox" checked={ld.defaultChecked} data-id={ld.id}
+									<lightning-input type="checkbox" checked={ld.defaultChecked} data-id={ld.company}
 										onchange={handleCheckboxChange}></lightning-input>
 								</div>
 							</td>
@@ -256,16 +415,15 @@
 								<div>{ld.annual_growth}</div>
 							</td>
 							<td scope="col">
+								<div>{ld.headquarters}</div>
+							</td>
+							<td scope="col">
 								<div>{ld.Status}</div>
-								<!-- <lightning-combobox name="progress" value={ld.dataSourceStatus} placeholder="Source"
-									data-id={index} options={ld.options} onchange={handleStatusChange}>
-								</lightning-combobox> -->
 							</td>
 						</tr>
 					</template>
 				</tbody>
 			</table>
-
 			<template if:true={isDisplayNoRecords}>
 				<div class="slds-align_absolute-center">
 					<br/>
@@ -274,36 +432,37 @@
 			</template>
 
 			<br/>
-			
+
 			<div class="slds-align_absolute-center">
 				<div class="slds-p-right_xx-small">
 
-					<lightning-button label="" icon-name="utility:chevronleft" name="prev" variant="base" onclick={handlePrevNext} disabled={disablePrev}> 
+					<lightning-button label="" icon-name="utility:chevronleft" name="prev" variant="base"
+						onclick={handlePrevNext} disabled={disablePrev}>
 					</lightning-button>
 				</div>
 				<span class="slds-badge slds-badge_lightest">
-    
 					<b>Page {pageNo} of {lastPage}</b>
                 </span>
 				<div class="slds-p-left_xx-small">
-				
-					<lightning-button label=""  icon-name="utility:chevronright" name="next" variant="base" onclick={handlePrevNext} disabled={disableNext}>
+
+					<lightning-button label="" icon-name="utility:chevronright" name="next" variant="base"
+						onclick={handlePrevNext} disabled={disableNext}>
 					</lightning-button>
 				</div>
 			</div>
 
-		
-				<div class="slds-grid slds-gutters slds-align_absolute-center">
-					<div class="slds-m-top_small slds-m-left_x-small">
-						<span>
+
+			<div class="slds-grid slds-gutters slds-align_absolute-center">
+				<div class="slds-m-top_small slds-m-left_x-small">
+					<span>
                      <lightning-button label="Previous" variant="brand-outline" onclick={handlePrevious}></lightning-button>
                   </span>
-					</div>
-					<div class="slds-m-top_small slds-m-left_x-small">
-						<lightning-button label="Save Leads" variant="brand" onclick={handleSave}></lightning-button>
-					</div>
 				</div>
-		
+				<div class="slds-m-top_small slds-m-left_x-small">
+					<lightning-button label="Save Leads" variant="brand" onclick={handleSave}></lightning-button>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </template>
